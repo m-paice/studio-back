@@ -5,7 +5,9 @@ import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const controller = controllerDefaut(servicesResource);
+const whiteList = ['products'];
+
+const controller = controllerDefaut(servicesResource, whiteList);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {

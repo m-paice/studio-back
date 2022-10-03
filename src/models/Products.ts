@@ -5,11 +5,16 @@ import { CategoryInstance } from './Categories';
 
 export type ProductInstance = {
   id: string;
-  name: string;
   category: CategoryInstance;
   categoryId: string;
+  name: string;
+  price: number;
+  amount: number;
   createdAt?: Date;
   updatedAt?: Date;
+
+  addService: (model, options?) => Promise<void>;
+  removeService: (model, options?) => Promise<void>;
 };
 
 const Product = sequelize.define(
@@ -21,6 +26,8 @@ const Product = sequelize.define(
       primaryKey: true,
     },
     name: Sequelize.STRING,
+    price: Sequelize.DOUBLE,
+    amount: Sequelize.INTEGER,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,
@@ -39,6 +46,12 @@ Product.associate = (models) => {
   Product.belongsTo(models.Categories, {
     foreignKey: 'categoryId',
     as: 'category',
+  });
+
+  Product.belongsToMany(models.Services, {
+    foreignKey: 'productId',
+    through: 'product_service',
+    as: 'services',
   });
 };
 

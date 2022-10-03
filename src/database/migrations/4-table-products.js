@@ -15,6 +15,8 @@ module.exports = {
         },
       },
       name: Sequelize.STRING,
+      price: Sequelize.DOUBLE,
+      amount: Sequelize.INTEGER,
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

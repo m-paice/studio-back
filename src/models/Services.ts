@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 import sequelize from '../services/sequelize';
+import { ProductInstance } from './Products';
 
 export type ServiceInstance = {
   id: string;
@@ -10,6 +11,11 @@ export type ServiceInstance = {
   porcent: number;
   createdAt?: Date;
   updatedAt?: Date;
+
+  products: ProductInstance[];
+
+  addProduct: (model, options?) => Promise<void>;
+  removeProduct: (model, options?) => Promise<void>;
 };
 
 const Service = sequelize.define(
@@ -42,6 +48,12 @@ Service.associate = (models) => {
   Service.hasMany(models.Schedules, {
     foreignKey: 'serviceId',
     as: 'schedules',
+  });
+
+  Service.belongsToMany(models.Products, {
+    foreignKey: 'serviceId',
+    through: 'product_service',
+    as: 'products',
   });
 };
 
