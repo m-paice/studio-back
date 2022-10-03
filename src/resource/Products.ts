@@ -5,7 +5,7 @@ import BaseResource from './BaseResource';
 
 export class ProductResource extends BaseResource<ProductInstance> {
   constructor() {
-    super(ProductRepository);
+    super(ProductRepository, 'products');
   }
 
   async findProductByName(name) {
