@@ -12,6 +12,7 @@ module.exports = {
       cellPhone: Sequelize.STRING,
       password: Sequelize.STRING,
       isSuperAdmin: Sequelize.BOOLEAN,
+      birthDate: Sequelize.DATE,
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
