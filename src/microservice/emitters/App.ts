@@ -7,7 +7,7 @@ export default class App {
       try {
         await HistoricPrices.create({
           productId: data.id,
-          newValue: data.price,
+          value: data.price,
         });
       } catch (error) {
         console.log(error);
@@ -18,7 +18,7 @@ export default class App {
       try {
         await HistoricPrices.create({
           productId: data.id,
-          newValue: data.price,
+          value: data.price,
         });
       } catch (error) {
         console.log(error);

@@ -7,8 +7,7 @@ export type HistoricPriceInstance = {
   id: string;
   product: ProductInstance;
   productId: string;
-  oldValue: number;
-  newValue: number;
+  value: number;
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -21,8 +20,7 @@ const HistoricPrice = sequelize.define(
       defaultValue: Sequelize.UUIDV4,
       primaryKey: true,
     },
-    oldValue: Sequelize.DOUBLE,
-    newValue: Sequelize.DOUBLE,
+    value: Sequelize.DOUBLE,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,

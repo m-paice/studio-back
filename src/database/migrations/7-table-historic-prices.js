@@ -15,8 +15,7 @@ module.exports = {
           key: 'id',
         },
       },
-      oldValue: Sequelize.DOUBLE,
-      newValue: Sequelize.DOUBLE,
+      value: Sequelize.DOUBLE,
       createdAt: {
         type: Sequelize.DATE,
       },
