@@ -80,6 +80,8 @@ export class ReportResource extends BaseResource<ReportInstance> {
       .slice(0, 5)
       .map(({ item, value }) => ({ name: item.name, value }));
 
+    const productPriceSugestion = entry.total * 0.1;
+
     return {
       entry,
       out,
@@ -87,6 +89,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
       countCanceled,
       countUsers,
       serviceCount: fiveMaxService,
+      productPriceSugestion,
     };
   }
 }
