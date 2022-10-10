@@ -31,11 +31,33 @@ export class ServiceResource extends BaseResource<ServiceInstance> {
       await queuedAsyncMap(data.products, async (item) => {
         const product = await Products.findById(item.id);
 
-        serviceCreated.addProduct(product);
+        await serviceCreated.addProduct(product);
       });
     }
 
     return serviceCreated;
+  }
+
+  async updateById(id: string, data: Data) {
+    const serviceUpdated = await ServiceRepository.updateById(id, data);
+
+    const allProducts = await ServiceRepository.findById(serviceUpdated.id, {
+      include: ['products'],
+    });
+
+    await queuedAsyncMap(allProducts.products, async (item) => {
+      const product = await Products.findById(item.id);
+      await serviceUpdated.removeProduct(product);
+    });
+
+    if (Array.isArray(data.products) && data.products.length) {
+      await queuedAsyncMap(data.products, async (item) => {
+        const product = await Products.findById(item.id);
+        await serviceUpdated.addProduct(product);
+      });
+    }
+
+    return serviceUpdated;
   }
 }
 

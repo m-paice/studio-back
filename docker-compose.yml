@@ -13,3 +13,19 @@ services:
     shm_size: '256mb'
     ports:
       - 5435:5432
+
+  # back:
+  #   container_name: studio-back
+  #   image: paice0510/api-studio
+  #   restart: always
+  #   env_file:
+  #     - envfile.env
+  #   ports:
+  #     - 3333:3333
+
+  # front:
+  #   container_name: studio-front
+  #   image: paice0510/front-studio
+  #   restart: always
+  #   ports:
+  #     - 3000:80

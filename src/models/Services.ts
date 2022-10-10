@@ -16,6 +16,7 @@ export type ServiceInstance = {
 
   addProduct: (model, options?) => Promise<void>;
   removeProduct: (model, options?) => Promise<void>;
+  removeProducts: (options?) => Promise<void>;
 };
 
 const Service = sequelize.define(
@@ -52,7 +53,7 @@ Service.associate = (models) => {
 
   Service.belongsToMany(models.Products, {
     foreignKey: 'serviceId',
-    through: 'product_service',
+    through: models.ProductService,
     as: 'products',
   });
 };

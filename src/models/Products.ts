@@ -50,7 +50,7 @@ Product.associate = (models) => {
 
   Product.belongsToMany(models.Services, {
     foreignKey: 'productId',
-    through: 'product_service',
+    through: models.ProductService,
     as: 'services',
   });
 };
