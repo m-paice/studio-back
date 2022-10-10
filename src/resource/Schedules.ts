@@ -23,9 +23,19 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
     if (status === 'finished' && !scheduleUpdated.isPackage) {
       const service = await ServiceResource.findById(scheduleUpdated.serviceId);
 
+      let total = service.price;
+
+      if (scheduleUpdated.discount) {
+        total -= scheduleUpdated.discount;
+      }
+
+      if (scheduleUpdated.addition) {
+        total += scheduleUpdated.addition;
+      }
+
       await ReportResource.create({
         scheduleId: scheduleUpdated.id,
-        entry: service.price,
+        entry: total,
         ...(service.type === 'partial' && {
           out: (service.porcent / 100) * service.price,
         }),

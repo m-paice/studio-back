@@ -14,6 +14,8 @@ export type ScheduleInstance = {
   employeeId: string;
   scheduleAt: Date;
   status: 'pending' | 'finished' | 'canceled';
+  discount: number;
+  addition: number;
   isPackage: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -32,6 +34,8 @@ const Schedule = sequelize.define(
       type: Sequelize.STRING,
       defaultValue: 'pending',
     },
+    discount: Sequelize.DOUBLE,
+    addition: Sequelize.DOUBLE,
     isPackage: Sequelize.BOOLEAN,
     createdAt: {
       type: Sequelize.DATE,
