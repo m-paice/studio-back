@@ -37,7 +37,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
         scheduleId: scheduleUpdated.id,
         entry: total,
         ...(service.type === 'partial' && {
-          out: (service.porcent / 100) * service.price,
+          out: (total / 100) * service.price,
         }),
       });
     }

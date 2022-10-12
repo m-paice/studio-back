@@ -6,6 +6,7 @@ import ScheduleResource from './Schedules';
 import ServiceResource from './Services';
 import userResource from './Users';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
+import Schedules from '../models/Schedules';
 
 export class ReportResource extends BaseResource<ReportInstance> {
   constructor() {
@@ -13,31 +14,40 @@ export class ReportResource extends BaseResource<ReportInstance> {
   }
 
   async reports({ startAt, endAt }: { startAt: Date; endAt: Date }) {
+    console.log(startAt);
+    console.log(endAt);
+
     const defaultWhere = {
       scheduleAt: {
         [Op.between]: [startAt, endAt],
       },
     };
 
-    const [entry] = await ReportRepository.findMany({
-      where: {
-        createdAt: {
-          [Op.between]: [startAt, endAt],
+    const reports = await ReportRepository.findMany({
+      include: [
+        {
+          model: Schedules,
+          as: 'schedule',
+          where: {
+            ...defaultWhere,
+            status: 'finished',
+          },
         },
-      },
-      attributes: [[sequelize.fn('sum', sequelize.col('entry')), 'total']],
-      raw: true,
+      ],
     });
 
-    const [out] = await ReportRepository.findMany({
-      where: {
-        createdAt: {
-          [Op.between]: [startAt, endAt],
-        },
+    const response = reports.reduce(
+      (acc, cur) => {
+        return {
+          entry: acc['entry'] + cur.entry,
+          out: acc['out'] + cur.out,
+        };
       },
-      attributes: [[sequelize.fn('sum', sequelize.col('out')), 'total']],
-      raw: true,
-    });
+      {
+        entry: 0,
+        out: 0,
+      }
+    );
 
     const countFinished = await ScheduleResource.count({
       where: {
@@ -80,16 +90,55 @@ export class ReportResource extends BaseResource<ReportInstance> {
       .slice(0, 5)
       .map(({ item, value }) => ({ name: item.name, value }));
 
-    const productPriceSugestion = entry.total * 0.1;
+    const productPriceSugestion = response.entry * 0.1;
+
+    const schedulesInfo = await ReportRepository.findMany({
+      attributes: ['id'],
+      include: [
+        {
+          model: Schedules,
+          as: 'schedule',
+          attributes: ['id'],
+          include: ['service'],
+          where: {
+            ...defaultWhere,
+            status: 'finished',
+          },
+        },
+      ],
+    });
+
+    const employeeInfo = await ReportRepository.findMany({
+      where: {
+        out: {
+          [Op.ne]: null,
+        },
+      },
+      attributes: ['id', 'out'],
+      include: [
+        {
+          model: Schedules,
+          as: 'schedule',
+          attributes: ['id'],
+          include: ['employee'],
+          where: {
+            ...defaultWhere,
+            status: 'finished',
+          },
+        },
+      ],
+    });
 
     return {
-      entry,
-      out,
+      entry: response.entry,
+      out: response.out,
       countFinished,
       countCanceled,
       countUsers,
       serviceCount: fiveMaxService,
       productPriceSugestion,
+      schedulesInfo,
+      employeeInfo,
     };
   }
 }

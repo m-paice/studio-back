@@ -12,8 +12,8 @@ const controllerCustom = {
     const { endAt, startAt } = req.body;
 
     const response = await reportsResource.reports({
-      startAt,
-      endAt,
+      startAt: new Date(startAt),
+      endAt: new Date(endAt),
     });
 
     return response;
