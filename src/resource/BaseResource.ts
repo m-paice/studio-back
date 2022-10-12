@@ -1,3 +1,4 @@
+import { pick } from 'lodash';
 import { Options, FindOptions, CreateOptions } from 'sequelize';
 import BaseSequelizeRepository from '../repository/BaseRepository';
 
@@ -15,6 +16,11 @@ export interface IOptions<T> extends FindOptions<T> {
   dontEmit?: boolean;
 }
 
+type PaginatedOptions<T> = IOptions<T> & {
+  page?: number | string;
+  perPage?: number | string;
+};
+
 export default class BaseResource<TModel extends Instance> {
   protected readonly repository: BaseSequelizeRepository<TModel>;
 
@@ -28,6 +34,7 @@ export default class BaseResource<TModel extends Instance> {
     this.events = [CREATED, UPDATED, DESTROYED];
 
     this.getRepository = this.getRepository.bind(this);
+    this.findManyPaginated = this.findManyPaginated.bind(this);
     this.findMany = this.findMany.bind(this);
     this.findOne = this.findOne.bind(this);
     this.findById = this.findById.bind(this);
@@ -47,7 +54,6 @@ export default class BaseResource<TModel extends Instance> {
 
     // this.reload = this.reload.bind(this)
     // this.count = this.count.bind(this)
-    // this.findManyPaginated = this.findManyPaginated.bind(this)
     // this.findManyByIds = this.findManyByIds.bind(this)
     // this.bulkUpdate = this.bulkUpdate.bind(this)
     // this.bulkDestroy = this.bulkDestroy.bind(this)
@@ -79,6 +85,38 @@ export default class BaseResource<TModel extends Instance> {
 
   emitUpdated(data) {
     return this.emit(`${this.entity}.${UPDATED}`, data);
+  }
+
+  async findManyPaginated(options: PaginatedOptions<TModel> = {}) {
+    const DEFAULT_PER_PAGE = 10;
+
+    const page = parseInt(`${options.page || '1'}`, 10);
+    const perPage = parseInt(`${options.perPage || DEFAULT_PER_PAGE}`, 10);
+    const from = (page - 1) * perPage;
+    const to = page * perPage;
+    const limit = to - from;
+
+    const q = {
+      offset: from,
+      limit,
+      ...pick(options, ['where', 'order', 'include']),
+    };
+
+    const count = await this.getRepository().count({ ...q, distinct: true });
+    const result = await this.getRepository().findMany(q);
+
+    const lastPage = Math.ceil(count / perPage) || 1;
+
+    return {
+      data: result,
+      total: count,
+      limit: q.limit,
+      skip: q.offset,
+      currentPage: page,
+      lastPage,
+      from,
+      to,
+    };
   }
 
   findMany(query: FindOptions<TModel>) {

@@ -24,7 +24,7 @@ const controllerCustom = {
 
 const router = Router();
 
-router.get('/', controller.index);
+router.get('/', controller.many);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 

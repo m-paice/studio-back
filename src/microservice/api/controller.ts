@@ -1,12 +1,29 @@
 import { Request, Response } from 'express';
 
 export default <T>(resource: any, whiteList?: string[]) => {
-  const index = async (req: Request, res: Response) => {
+  const many = async (req: Request, res: Response) => {
     const { query } = req;
 
     try {
       const response = await resource
         .findMany({
+          ...query,
+          ...(whiteList && { include: whiteList }),
+        })
+        .then((data: Partial<T>) => data);
+
+      return res.json(response);
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  };
+
+  const index = async (req: Request, res: Response) => {
+    const { query } = req;
+
+    try {
+      const response = await resource
+        .findManyPaginated({
           ...query,
           ...(whiteList && { include: whiteList }),
         })
@@ -80,6 +97,7 @@ export default <T>(resource: any, whiteList?: string[]) => {
   };
 
   return {
+    many,
     index,
     show,
     create,
