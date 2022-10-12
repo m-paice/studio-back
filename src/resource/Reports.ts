@@ -98,7 +98,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
         {
           model: Schedules,
           as: 'schedule',
-          attributes: ['id'],
+          attributes: ['id', 'discount', 'addition'],
           include: ['service'],
           where: {
             ...defaultWhere,
