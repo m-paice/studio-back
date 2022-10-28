@@ -120,7 +120,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
           model: Schedules,
           as: 'schedule',
           attributes: ['id'],
-          include: ['employee'],
+          include: ['employee', 'service'],
           where: {
             ...defaultWhere,
             status: 'finished',
@@ -140,6 +140,52 @@ export class ReportResource extends BaseResource<ReportInstance> {
       schedulesInfo,
       employeeInfo,
     };
+  }
+
+  async createOrUpdate({
+    reportId = null,
+    serviceId,
+    scheduleId,
+    discount,
+    addition,
+  }: {
+    reportId?: string | null;
+    serviceId: string;
+    scheduleId: string;
+    discount: number;
+    addition: number;
+  }) {
+    const service = await ServiceResource.findById(serviceId);
+
+    let total = service.price;
+
+    if (discount) {
+      total -= discount;
+    }
+
+    if (addition) {
+      total += addition;
+    }
+
+    if (reportId) {
+      await ReportRepository.updateById(reportId, {
+        scheduleId,
+        entry: total,
+        ...(service.type === 'partial' && {
+          out: (service.porcent / 100) * total,
+        }),
+      });
+
+      return;
+    }
+
+    await ReportRepository.create({
+      scheduleId,
+      entry: total,
+      ...(service.type === 'partial' && {
+        out: (service.porcent / 100) * total,
+      }),
+    });
   }
 }
 
