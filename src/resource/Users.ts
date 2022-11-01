@@ -8,15 +8,23 @@ export class UserResource extends BaseResource<UserInstance> {
     super(UserRepository);
   }
 
-  async findUserByName(name) {
-    return UserRepository.findMany({
-      where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+  async findUserByName(name, query) {
+    const nameLower = sequelize.where(
+      sequelize.fn('lower', sequelize.col('name')),
+      {
         [Op.like]: `%${name}%`,
-      }),
+      }
+    );
+
+    return UserRepository.findMany({
+      where: {
+        nameLower,
+        ...query.where,
+      },
     });
   }
 
-  async findUserEmployeeByName(name) {
+  async findUserEmployeeByName(name, query) {
     return UserRepository.findMany({
       where: {
         [Op.and]: [
@@ -25,6 +33,7 @@ export class UserResource extends BaseResource<UserInstance> {
             [Op.like]: `%${name}%`,
           }),
         ],
+        ...query.where,
       },
     });
   }

@@ -5,6 +5,7 @@ import { CategoryInstance } from './Categories';
 
 export type ProductInstance = {
   id: string;
+  accountId: string;
   category: CategoryInstance;
   categoryId: string;
   name: string;
@@ -43,6 +44,10 @@ const Product = sequelize.define(
 );
 
 Product.associate = (models) => {
+  Product.belongsTo(models.Accounts, {
+    foreignKey: 'accountId',
+    as: 'account',
+  });
   Product.belongsTo(models.Categories, {
     foreignKey: 'categoryId',
     as: 'category',
@@ -52,6 +57,12 @@ Product.associate = (models) => {
     foreignKey: 'productId',
     through: models.ProductService,
     as: 'services',
+  });
+
+  Product.belongsToMany(models.Sales, {
+    foreignKey: 'productId',
+    through: models.ProductSale,
+    as: 'sales',
   });
 };
 

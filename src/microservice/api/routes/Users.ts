@@ -1,21 +1,28 @@
 import { Router } from 'express';
+import { accountContext } from '../../../middleware/accountContext';
 
 import usersResource from '../../../resource/Users';
 import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const controller = controllerDefaut(usersResource);
+const includeWhiteList = ['account'];
+
+const controller = controllerDefaut(usersResource, includeWhiteList);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await usersResource.findUserByName(req.params.name);
+    const response = await usersResource.findUserByName(
+      req.params.name,
+      req.query
+    );
 
     return response;
   }),
   findEmployeeByName: promiseHandler(async (req) => {
     const response = await usersResource.findUserEmployeeByName(
-      req.params.name
+      req.params.name,
+      req.query
     );
 
     return response;
@@ -23,6 +30,8 @@ const controllerCustom = {
 };
 
 const router = Router();
+
+router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { accountContext } from '../../../middleware/accountContext';
 
 import servicesResource from '../../../resource/Services';
 import { promiseHandler } from '../../../utils/routing';
@@ -11,7 +12,10 @@ const controller = controllerDefaut(servicesResource, whiteList);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await servicesResource.findServiceByName(req.params.name);
+    const response = await servicesResource.findServiceByName(
+      req.params.name,
+      req.query
+    );
 
     return response;
   }),
@@ -25,6 +29,8 @@ const handleFormatData = (req, res, next) => {
 
   return next();
 };
+
+router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

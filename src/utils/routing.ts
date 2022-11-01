@@ -1,9 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { ServerResponse } from 'http';
-
-interface IRequest extends Request {
-  userId: string;
-}
+import { IRequest } from '../middleware/auth';
 
 type HandlerFunction = (
   req: IRequest,

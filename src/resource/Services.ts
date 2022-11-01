@@ -16,11 +16,19 @@ export class ServiceResource extends BaseResource<ServiceInstance> {
     super(ServiceRepository);
   }
 
-  async findServiceByName(name) {
-    return ServiceRepository.findMany({
-      where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+  async findServiceByName(name, query) {
+    const nameLower = sequelize.where(
+      sequelize.fn('lower', sequelize.col('name')),
+      {
         [Op.like]: `%${name}%`,
-      }),
+      }
+    );
+
+    return ServiceRepository.findMany({
+      where: {
+        nameLower,
+        ...query.where,
+      },
     });
   }
 

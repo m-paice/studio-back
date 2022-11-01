@@ -15,11 +15,19 @@ export class CategoriesResource extends BaseResource<CategoryInstance> {
     super(CategoriesRepository);
   }
 
-  async findCategoryByName(name) {
-    return CategoriesRepository.findMany({
-      where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+  async findCategoryByName(name, query) {
+    const nameLower = sequelize.where(
+      sequelize.fn('lower', sequelize.col('name')),
+      {
         [Op.like]: `%${name}%`,
-      }),
+      }
+    );
+
+    return CategoriesRepository.findMany({
+      where: {
+        nameLower,
+        ...query.where,
+      },
     });
   }
 

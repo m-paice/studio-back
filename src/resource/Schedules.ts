@@ -30,6 +30,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
         addition: scheduleUpdated.addition,
         discount: scheduleUpdated.discount,
         reportId: report.id,
+        accountId: data.accountId,
       });
     }
 
@@ -39,9 +40,11 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
   async changeStatus({
     id,
     status,
+    accountId,
   }: {
     id: string;
     status: 'pending' | 'finished' | 'canceled';
+    accountId: string;
   }) {
     const scheduleUpdated = await ScheduleRepository.updateById(id, {
       status,
@@ -53,6 +56,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
         serviceId: scheduleUpdated.serviceId,
         addition: scheduleUpdated.addition,
         discount: scheduleUpdated.discount,
+        accountId,
       });
     }
 

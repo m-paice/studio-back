@@ -1,12 +1,16 @@
 import Sequelize from 'sequelize';
 
 import sequelize from '../services/sequelize';
+import { SalesInstance } from './Sales';
 import { ScheduleInstance } from './Schedules';
 
 export type ReportInstance = {
   id: string;
+  accountId: string;
   scheduleId: string;
   schedule: ScheduleInstance;
+  saleId: string;
+  sale: SalesInstance;
   entry: number;
   out: number;
   createdAt?: Date;
@@ -38,9 +42,17 @@ const Report = sequelize.define(
 );
 
 Report.associate = (models) => {
+  Report.belongsTo(models.Accounts, {
+    foreignKey: 'accountId',
+    as: 'account',
+  });
   Report.belongsTo(models.Schedules, {
     foreignKey: 'scheduleId',
     as: 'schedule',
+  });
+  Report.belongsTo(models.Sales, {
+    foreignKey: 'saleId',
+    as: 'sale',
   });
 };
 

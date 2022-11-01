@@ -6,6 +6,9 @@ import Products from './Products';
 import Categories from './Categories';
 import HistoricPrices from './HistoricPrices';
 import ProductService from './ProductService';
+import Accounts from './Accounts';
+import Sales from './Sales';
+import ProductSale from './ProductSale';
 
 export default {
   Services,
@@ -16,4 +19,7 @@ export default {
   Categories,
   HistoricPrices,
   ProductService,
+  Accounts,
+  Sales,
+  ProductSale,
 };

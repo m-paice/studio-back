@@ -5,6 +5,7 @@ import { ProductInstance } from './Products';
 
 export type ServiceInstance = {
   id: string;
+  accountId: string;
   name: string;
   type: string;
   price: number;
@@ -46,6 +47,10 @@ const Service = sequelize.define(
 );
 
 Service.associate = (models) => {
+  Service.belongsTo(models.Accounts, {
+    foreignKey: 'accountId',
+    as: 'account',
+  });
   Service.hasMany(models.Schedules, {
     foreignKey: 'serviceId',
     as: 'schedules',

@@ -13,10 +13,43 @@ export class ReportResource extends BaseResource<ReportInstance> {
     super(ReportRepository);
   }
 
-  async reports({ startAt, endAt }: { startAt: Date; endAt: Date }) {
-    console.log(startAt);
-    console.log(endAt);
+  async saleReports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {
+    const reports = await ReportRepository.findMany({
+      where: {
+        createdAt: {
+          [Op.between]: [startAt, endAt],
+        },
+        ...query.where,
+      },
+    });
 
+    const response = reports.reduce(
+      (acc, cur) => {
+        return {
+          entry: acc['entry'] + cur.entry,
+          out: acc['out'] + cur.out,
+        };
+      },
+      {
+        entry: 0,
+        out: 0,
+      }
+    );
+
+    return {
+      entry: response.entry,
+      out: response.out,
+      countFinished: 0,
+      countCanceled: 0,
+      countUsers: 0,
+      serviceCount: [],
+      productPriceSugestion: 0,
+      schedulesInfo: [],
+      employeeInfo: [],
+    };
+  }
+
+  async reports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {
     const defaultWhere = {
       scheduleAt: {
         [Op.between]: [startAt, endAt],
@@ -24,12 +57,14 @@ export class ReportResource extends BaseResource<ReportInstance> {
     };
 
     const reports = await ReportRepository.findMany({
+      ...query,
       include: [
         {
           model: Schedules,
           as: 'schedule',
           where: {
             ...defaultWhere,
+            ...query.where,
             status: 'finished',
           },
         },
@@ -52,6 +87,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
     const countFinished = await ScheduleResource.count({
       where: {
         ...defaultWhere,
+        ...query.where,
         status: 'finished',
       },
     });
@@ -59,12 +95,14 @@ export class ReportResource extends BaseResource<ReportInstance> {
     const countCanceled = await ScheduleResource.count({
       where: {
         ...defaultWhere,
+        ...query.where,
         status: 'canceled',
       },
     });
 
     const countUsers = await userResource.count({
       where: {
+        ...query.where,
         type: 'pf',
         createdAt: {
           [Op.between]: [startAt, endAt],
@@ -72,12 +110,13 @@ export class ReportResource extends BaseResource<ReportInstance> {
       },
     });
 
-    const services = await ServiceResource.findMany({});
+    const services = await ServiceResource.findMany(query);
 
     const serviceCount = await queuedAsyncMap(services, async (item) => {
       const countService = await ScheduleResource.count({
         where: {
           ...defaultWhere,
+          ...query.where,
           serviceId: item.id,
         },
       });
@@ -93,6 +132,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
     const productPriceSugestion = response.entry * 0.1;
 
     const schedulesInfo = await ReportRepository.findMany({
+      ...query,
       attributes: ['id'],
       include: [
         {
@@ -102,6 +142,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
           include: ['service'],
           where: {
             ...defaultWhere,
+            ...query.where,
             status: 'finished',
           },
         },
@@ -110,6 +151,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
 
     const employeeInfo = await ReportRepository.findMany({
       where: {
+        ...query.where,
         out: {
           [Op.ne]: null,
         },
@@ -123,6 +165,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
           include: ['employee', 'service'],
           where: {
             ...defaultWhere,
+            ...query.where,
             status: 'finished',
           },
         },
@@ -148,12 +191,14 @@ export class ReportResource extends BaseResource<ReportInstance> {
     scheduleId,
     discount,
     addition,
+    accountId,
   }: {
     reportId?: string | null;
     serviceId: string;
     scheduleId: string;
     discount: number;
     addition: number;
+    accountId: string;
   }) {
     const service = await ServiceResource.findById(serviceId);
 
@@ -174,6 +219,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
         ...(service.type === 'partial' && {
           out: (service.porcent / 100) * total,
         }),
+        accountId,
       });
 
       return;
@@ -185,6 +231,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
       ...(service.type === 'partial' && {
         out: (service.porcent / 100) * total,
       }),
+      accountId,
     });
   }
 }

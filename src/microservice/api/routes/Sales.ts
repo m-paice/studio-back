@@ -1,20 +1,20 @@
 import { Router } from 'express';
 import { accountContext } from '../../../middleware/accountContext';
 
-import productResource from '../../../resource/Products';
+import salesResource from '../../../resource/Sales';
 import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const whiteList = ['category'];
+const includeWhiteList = ['products', 'user'];
 
-const controller = controllerDefaut(productResource, whiteList);
+const controller = controllerDefaut(salesResource, includeWhiteList);
 
 const controllerCustom = {
-  findByName: promiseHandler(async (req) => {
-    const response = await productResource.findProductByName(
-      req.params.name,
-      req.query
+  updateSaleById: promiseHandler(async (req) => {
+    const response = await salesResource.updateSaleById(
+      req.params.id,
+      req.body
     );
 
     return response;
@@ -27,9 +27,8 @@ router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);
-router.get('/search/:name', controllerCustom.findByName);
 router.post('/', controller.create);
-router.put('/:id', controller.update);
+router.put('/:id', controllerCustom.updateSaleById);
 router.delete('/:id', controller.destroy);
 
 export default router;

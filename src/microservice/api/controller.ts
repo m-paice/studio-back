@@ -26,6 +26,7 @@ export default <T>(resource: any, whiteList?: string[]) => {
         .findManyPaginated({
           ...query,
           ...(whiteList && { include: whiteList }),
+          order: [['updatedAt', 'DESC']],
         })
         .then((data: Partial<T>) => data);
 
@@ -63,6 +64,8 @@ export default <T>(resource: any, whiteList?: string[]) => {
 
       return res.json(response);
     } catch (error) {
+      console.log(error);
+
       return res.status(500).json(error);
     }
   };

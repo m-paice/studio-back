@@ -2,21 +2,16 @@ import Sequelize from 'sequelize';
 
 import sequelize from '../services/sequelize';
 
-export type UserInstance = {
+export type AccountInstance = {
   id: string;
-  accountId: string;
   name: string;
   type: string;
-  cellPhone: string;
-  password: string;
-  isSuperAdmin: boolean;
-  birthDate: Date;
   createdAt?: Date;
   updatedAt?: Date;
 };
 
-const User = sequelize.define(
-  'User',
+const Account = sequelize.define(
+  'Account',
   {
     id: {
       type: Sequelize.UUID,
@@ -25,10 +20,6 @@ const User = sequelize.define(
     },
     name: Sequelize.STRING,
     type: Sequelize.STRING,
-    cellPhone: Sequelize.STRING,
-    password: Sequelize.STRING,
-    isSuperAdmin: Sequelize.BOOLEAN,
-    birthDate: Sequelize.DATE,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,
@@ -39,15 +30,10 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: 'users',
+    tableName: 'accounts',
   }
 );
 
-User.associate = (models) => {
-  User.belongsTo(models.Accounts, {
-    foreignKey: 'accountId',
-    as: 'account',
-  });
-};
+Account.associate = (models) => {};
 
-export default User;
+export default Account;

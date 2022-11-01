@@ -6,6 +6,7 @@ import { UserInstance } from './Users';
 
 export type ScheduleInstance = {
   id: string;
+  accountId: string;
   user: UserInstance;
   userId: string;
   service: ServiceInstance;
@@ -52,6 +53,10 @@ const Schedule = sequelize.define(
 );
 
 Schedule.associate = (models) => {
+  Schedule.belongsTo(models.Accounts, {
+    foreignKey: 'accountId',
+    as: 'account',
+  });
   Schedule.belongsTo(models.Users, {
     foreignKey: 'userId',
     as: 'user',

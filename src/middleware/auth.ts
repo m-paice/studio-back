@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 
 export interface IRequest extends Request {
   userId: string;
+  accountId: string;
+  isSuperAdmin: boolean;
 }
 
 const auth = (req: IRequest, res: Response, next: NextFunction) => {
@@ -15,9 +17,26 @@ const auth = (req: IRequest, res: Response, next: NextFunction) => {
 
   if (!decoded) return res.sendStatus(401);
 
-  req.userId = decoded.id;
+  req.userId = decoded.userId;
+  req.accountId = decoded.accountId;
+  req.isSuperAdmin = decoded.isSuperAdmin;
 
   return next();
+};
+
+export const generateToken = ({
+  userId,
+  accountId,
+  isSuperAdmin,
+}: {
+  userId: string;
+  accountId: string;
+  isSuperAdmin: boolean;
+}) => {
+  return jwt.sign(
+    { userId, accountId, isSuperAdmin },
+    process.env.VERIFY_TOKEN
+  );
 };
 
 export default auth;

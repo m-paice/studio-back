@@ -1,18 +1,15 @@
 import { Router } from 'express';
-import { accountContext } from '../../../middleware/accountContext';
 
-import productResource from '../../../resource/Products';
+import accountsResource from '../../../resource/Accounts';
 import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const whiteList = ['category'];
-
-const controller = controllerDefaut(productResource, whiteList);
+const controller = controllerDefaut(accountsResource);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await productResource.findProductByName(
+    const response = await accountsResource.findAccountByName(
       req.params.name,
       req.query
     );
@@ -22,8 +19,6 @@ const controllerCustom = {
 };
 
 const router = Router();
-
-router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

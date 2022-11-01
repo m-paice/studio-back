@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { accountContext } from '../../../middleware/accountContext';
 
 import categoryResource from '../../../resource/Categories';
 import { promiseHandler } from '../../../utils/routing';
@@ -9,13 +10,18 @@ const controller = controllerDefaut(categoryResource);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await categoryResource.findCategoryByName(req.params.name);
+    const response = await categoryResource.findCategoryByName(
+      req.params.name,
+      req.query
+    );
 
     return response;
   }),
 };
 
 const router = Router();
+
+router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

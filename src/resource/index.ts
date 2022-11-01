@@ -5,6 +5,8 @@ import Reports from './Reports';
 import Products from './Products';
 import Categories from './Categories';
 import HistoricPrices from './HistoricPrices';
+import Accounts from './Accounts';
+import Sales from './Sales';
 
 export default {
   Schedules,
@@ -14,4 +16,6 @@ export default {
   Products,
   Categories,
   HistoricPrices,
+  Accounts,
+  Sales,
 };

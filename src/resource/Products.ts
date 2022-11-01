@@ -8,11 +8,19 @@ export class ProductResource extends BaseResource<ProductInstance> {
     super(ProductRepository, 'products');
   }
 
-  async findProductByName(name) {
-    return ProductRepository.findMany({
-      where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+  async findProductByName(name, query) {
+    const nameLower = sequelize.where(
+      sequelize.fn('lower', sequelize.col('name')),
+      {
         [Op.like]: `%${name}%`,
-      }),
+      }
+    );
+
+    return ProductRepository.findMany({
+      where: {
+        nameLower,
+        ...query.where,
+      },
     });
   }
 }

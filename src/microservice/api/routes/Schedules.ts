@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { accountContext } from '../../../middleware/accountContext';
 
 import schedulesResource from '../../../resource/Schedules';
 import { promiseHandler } from '../../../utils/routing';
@@ -12,10 +13,12 @@ const controller = controllerDefaut(schedulesResource, whiteList);
 const controllerCustom = {
   changeStatus: promiseHandler(async (req) => {
     const { status } = req.body;
+    const { accountId } = req;
 
     const response = await schedulesResource.changeStatus({
       id: req.params.id,
       status,
+      accountId,
     });
 
     return response;
@@ -25,6 +28,7 @@ const controllerCustom = {
       ...req.body,
       addition: Number(req.body.addition),
       discount: Number(req.body.discount),
+      accountId: req.accountId,
     };
 
     const response = await schedulesResource.updateScheduleById(
@@ -37,6 +41,8 @@ const controllerCustom = {
 };
 
 const router = Router();
+
+router.use(accountContext);
 
 router.get('/', controller.many);
 router.get('/:id', controller.show);
