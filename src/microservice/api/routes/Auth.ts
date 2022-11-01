@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { generateToken } from '../../../middleware/auth';
 
-import usersResource from '../../../resource/Users';
+import AuthResource from '../../../resource/Auth';
+
 import { promiseHandler } from '../../../utils/routing';
 
 const router = Router();
@@ -10,26 +10,24 @@ const controllerCustom = {
   authLogin: promiseHandler(async (req) => {
     const { username, password } = req.body;
 
-    const user = await usersResource.findOne({
-      where: { cellPhone: username, password },
-      include: 'account',
+    const response = await AuthResource.authLogin({ username, password });
+
+    return response;
+  }),
+  resetPassword: promiseHandler(async (req) => {
+    const { cellPhone, oldPassword, newPassword } = req.body;
+
+    const response = await AuthResource.resetPassword({
+      cellPhone,
+      oldPassword,
+      newPassword,
     });
 
-    if (!user) throw new Error('invalid credentials');
-
-    const token = generateToken({
-      userId: user.id,
-      accountId: user.accountId,
-      isSuperAdmin: user.isSuperAdmin,
-    });
-
-    return {
-      token,
-      user,
-    };
+    return response;
   }),
 };
 
 router.post('/', controllerCustom.authLogin);
+router.post('/reset-password', controllerCustom.resetPassword);
 
 export default router;
