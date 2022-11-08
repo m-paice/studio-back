@@ -9,6 +9,7 @@ export function accountContext(
   if (req.isSuperAdmin) return next();
 
   req.query = {
+    ...req?.query,
     where: {
       // @ts-ignore
       ...req?.query?.where,
