@@ -46,9 +46,14 @@ const Schedule = sequelize.define(
       type: Sequelize.DATE,
       allowNull: false,
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
   },
   {
     tableName: 'schedules',
+    paranoid: true,
   }
 );
 

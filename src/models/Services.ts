@@ -40,9 +40,14 @@ const Service = sequelize.define(
       type: Sequelize.DATE,
       allowNull: false,
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
   },
   {
     tableName: 'services',
+    paranoid: true,
   }
 );
 

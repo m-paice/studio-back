@@ -37,9 +37,14 @@ const Product = sequelize.define(
       type: Sequelize.DATE,
       allowNull: false,
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
   },
   {
     tableName: 'products',
+    paranoid: true,
   }
 );
 

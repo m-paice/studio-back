@@ -27,9 +27,14 @@ const Category = sequelize.define(
       type: Sequelize.DATE,
       allowNull: false,
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
   },
   {
     tableName: 'categories',
+    paranoid: true,
   }
 );
 
