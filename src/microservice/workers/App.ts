@@ -1,13 +1,18 @@
 import Schedule from 'node-schedule';
 
 import Job from './interfaces/Job';
+import { handle } from './JobScheduleSendWarningMessage';
 
 export default class App {
-  protected jobs: [string, Job][] = [];
+  protected jobs = [
+    ['* * * * * *', handle], // Every minute
+  ];
 
-  protected runningJobs: Schedule.Job[];
-
-  async onStart() {}
+  async onStart() {
+    this.jobs.map(([rule, jobClass]) => {
+      return Schedule.scheduleJob(rule, jobClass);
+    });
+  }
 
   async onDeath() {}
 }
