@@ -6,7 +6,7 @@ import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const includeWhiteList = ['products', 'user'];
+const includeWhiteList = ['products', 'user', 'payment'];
 
 const controller = controllerDefaut(salesResource, includeWhiteList);
 

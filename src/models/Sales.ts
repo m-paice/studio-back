@@ -52,6 +52,11 @@ Sales.associate = (models) => {
     as: 'user',
   });
 
+  Sales.hasOne(models.Payments, {
+    foreignKey: 'saleId',
+    as: 'payment',
+  });
+
   Sales.belongsToMany(models.Products, {
     foreignKey: 'saleId',
     through: models.ProductSale,

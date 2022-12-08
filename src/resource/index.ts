@@ -7,6 +7,7 @@ import Categories from './Categories';
 import HistoricPrices from './HistoricPrices';
 import Accounts from './Accounts';
 import Sales from './Sales';
+import Payments from './Payments';
 
 export default {
   Schedules,
@@ -18,4 +19,5 @@ export default {
   HistoricPrices,
   Accounts,
   Sales,
+  Payments,
 };

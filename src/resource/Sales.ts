@@ -4,6 +4,7 @@ import BaseResource from './BaseResource';
 import ProductResource from './Products';
 import ReportResource from './Reports';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
+import Payments from './Payments';
 
 interface Products {
   id: string;
@@ -44,6 +45,13 @@ export class SalesResource extends BaseResource<SalesInstance> {
     const saleCreated = await SalesRepository.create({
       ...data,
       total,
+    });
+
+    await Payments.create({
+      saleId: saleCreated.id,
+      account: data.accountId,
+      formOfPayment: data.formOfPayment,
+      amountParcel: data.amountParcel,
     });
 
     await queuedAsyncMap<Products, void>(data.products, async (item) => {
@@ -106,14 +114,20 @@ export class SalesResource extends BaseResource<SalesInstance> {
     });
 
     const reportSale = await ReportResource.findOne({
-      where: {
-        saleId: saleUpdated.id,
-      },
+      where: { saleId: saleUpdated.id },
     });
 
     await ReportResource.updateById(reportSale.id, {
       entry: total,
     });
+
+    const payloadPayment = {
+      formOfPayment: data.formOfPayment,
+      amountParcel: data.amountParcel,
+      accountId: data.accountId,
+    };
+
+    await Payments.createOrUpdate(saleUpdated.id, payloadPayment);
 
     return saleUpdated;
   }

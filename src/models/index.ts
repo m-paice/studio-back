@@ -9,6 +9,7 @@ import ProductService from './ProductService';
 import Accounts from './Accounts';
 import Sales from './Sales';
 import ProductSale from './ProductSale';
+import Payments from './Payments';
 
 export default {
   Services,
@@ -22,4 +23,5 @@ export default {
   Accounts,
   Sales,
   ProductSale,
+  Payments,
 };
