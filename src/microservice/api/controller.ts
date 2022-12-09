@@ -26,7 +26,7 @@ export default <T>(resource: any, whiteList?: string[]) => {
         .findManyPaginated({
           ...query,
           ...(whiteList && { include: whiteList }),
-          order: [['updatedAt', 'DESC']],
+          order: query?.order || [['updatedAt', 'DESC']],
         })
         .then((data: Partial<T>) => data);
 
