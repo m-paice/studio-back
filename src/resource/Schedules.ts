@@ -2,6 +2,7 @@ import BaseResource from './BaseResource';
 import ScheduleRepository from '../repository/Schedules';
 import { ScheduleInstance } from '../models/Schedules';
 import ReportResource from './Reports';
+import queuedAsyncMap from '../utils/queuedAsyncMap';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -59,6 +60,28 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
         accountId,
       });
     }
+
+    return true;
+  }
+
+  async revert(data: { scheduleId: string }) {
+    const { scheduleId } = data;
+
+    const schedule = await ScheduleRepository.findById(scheduleId);
+
+    await ScheduleRepository.updateById(schedule.id, {
+      status: 'pending',
+    });
+
+    const reports = await ReportResource.findMany({
+      where: {
+        scheduleId: schedule.id,
+      },
+    });
+
+    await queuedAsyncMap(reports, async (item) => {
+      await ReportResource.destroyById(item.id);
+    });
 
     return true;
   }
