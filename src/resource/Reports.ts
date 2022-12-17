@@ -45,7 +45,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
       serviceCount: [],
       productPriceSugestion: 0,
       schedulesInfo: [],
-      employeeInfo: [],
+      registerInfo: reports,
     };
   }
 
@@ -149,39 +149,27 @@ export class ReportResource extends BaseResource<ReportInstance> {
       ],
     });
 
-    const employeeInfo = await ReportRepository.findMany({
+    const registerOut = await ReportRepository.findMany({
       where: {
+        createdAt: {
+          [Op.between]: [startAt, endAt],
+        },
         ...query.where,
-        out: {
-          [Op.ne]: null,
-        },
       },
-      attributes: ['id', 'out'],
-      include: [
-        {
-          model: Schedules,
-          as: 'schedule',
-          attributes: ['id'],
-          include: ['employee', 'service'],
-          where: {
-            ...defaultWhere,
-            ...query.where,
-            status: 'finished',
-          },
-        },
-      ],
     });
+
+    const valueRegisterOut = registerOut.reduce((acc, cur) => acc + cur.out, 0);
 
     return {
       entry: response.entry,
-      out: response.out,
+      out: response.out + valueRegisterOut,
       countFinished,
       countCanceled,
       countUsers,
       serviceCount: fiveMaxService,
       productPriceSugestion,
       schedulesInfo,
-      employeeInfo,
+      registerInfo: registerOut,
     };
   }
 
@@ -216,9 +204,6 @@ export class ReportResource extends BaseResource<ReportInstance> {
       await ReportRepository.updateById(reportId, {
         scheduleId,
         entry: total,
-        ...(service.type === 'partial' && {
-          out: (service.porcent / 100) * total,
-        }),
         accountId,
       });
 
@@ -228,10 +213,19 @@ export class ReportResource extends BaseResource<ReportInstance> {
     await ReportRepository.create({
       scheduleId,
       entry: total,
-      ...(service.type === 'partial' && {
-        out: (service.porcent / 100) * total,
-      }),
       accountId,
+    });
+  }
+
+  async registerOut(data: {
+    description: string;
+    value: number;
+    accountId: string;
+  }) {
+    return ReportRepository.create({
+      accountId: data.accountId,
+      out: data.value,
+      description: data.description,
     });
   }
 }

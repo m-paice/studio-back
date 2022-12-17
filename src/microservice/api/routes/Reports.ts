@@ -34,6 +34,13 @@ const controllerCustom = {
 
     return response;
   }),
+  registerOut: promiseHandler(async (req) => {
+    const payload = req.body;
+
+    const response = await reportsResource.registerOut(payload);
+
+    return response;
+  }),
 };
 
 const router = Router();
@@ -42,5 +49,7 @@ router.use(accountContext);
 
 router.get('/', controller.index);
 router.post('/', controllerCustom.reports);
+router.post('/register-out', controllerCustom.registerOut);
+router.delete('/:id', controller.destroy);
 
 export default router;

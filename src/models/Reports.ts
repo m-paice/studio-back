@@ -13,6 +13,7 @@ export type ReportInstance = {
   sale: SalesInstance;
   entry: number;
   out: number;
+  description: string;
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -27,6 +28,7 @@ const Report = sequelize.define(
     },
     entry: Sequelize.DOUBLE,
     out: Sequelize.DOUBLE,
+    description: Sequelize.STRING,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,
