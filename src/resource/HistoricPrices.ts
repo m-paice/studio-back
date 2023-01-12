@@ -6,6 +6,14 @@ export class HistoricPriceResource extends BaseResource<HistoricPriceInstance> {
   constructor() {
     super(HistoricPriceRepository);
   }
+
+  async historicPricesOfProductId(productId) {
+    return this.findMany({
+      where: {
+        productId,
+      },
+    });
+  }
 }
 
 export default new HistoricPriceResource();
