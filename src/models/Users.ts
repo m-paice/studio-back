@@ -10,7 +10,7 @@ export type UserInstance = {
   cellPhone: string;
   password: string;
   isSuperAdmin: boolean;
-  birthDate: Date;
+  birthDate: string;
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -28,7 +28,7 @@ const User = sequelize.define(
     cellPhone: Sequelize.STRING,
     password: Sequelize.STRING,
     isSuperAdmin: Sequelize.BOOLEAN,
-    birthDate: Sequelize.DATE,
+    birthDate: Sequelize.STRING,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,
