@@ -14,6 +14,13 @@ module.exports = {
           key: 'id',
         },
       },
+      accountId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'accounts',
+          key: 'id',
+        },
+      },
       saleId: {
         type: Sequelize.UUID,
         references: {

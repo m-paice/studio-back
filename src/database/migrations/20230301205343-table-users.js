@@ -7,12 +7,19 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
+      accountId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'accounts',
+          key: 'id',
+        },
+      },
       name: Sequelize.STRING,
       type: Sequelize.STRING,
       cellPhone: Sequelize.STRING,
       password: Sequelize.STRING,
       isSuperAdmin: Sequelize.BOOLEAN,
-      birthDate: Sequelize.DATE,
+      birthDate: Sequelize.STRING,
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

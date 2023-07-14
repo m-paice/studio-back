@@ -10,6 +10,7 @@ import Accounts from './Accounts';
 import Sales from './Sales';
 import ProductSale from './ProductSale';
 import Payments from './Payments';
+import ServiceSchedule from './ServiceSchedule';
 
 export default {
   Services,
@@ -24,4 +25,5 @@ export default {
   Sales,
   ProductSale,
   Payments,
+  ServiceSchedule
 };

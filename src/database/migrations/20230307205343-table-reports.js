@@ -7,13 +7,29 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
+      accountId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'accounts',
+          key: 'id',
+        },
+      },
       scheduleId: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
           model: 'schedules',
           key: 'id',
         },
+      },
+      saleId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'sales',
+          key: 'id',
+        },
+      },
+      description: {
+        type: Sequelize.STRING,
       },
       entry: Sequelize.DOUBLE,
       out: Sequelize.DOUBLE,

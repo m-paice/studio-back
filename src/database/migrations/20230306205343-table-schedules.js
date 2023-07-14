@@ -7,19 +7,18 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
+      accountId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'accounts',
+          key: 'id',
+        },
+      },
       userId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: 'users',
-          key: 'id',
-        },
-      },
-      serviceId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'services',
           key: 'id',
         },
       },
@@ -37,6 +36,14 @@ module.exports = {
         defaultValue: 'pending',
       },
       isPackage: Sequelize.BOOLEAN,
+      discount: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 0,
+      },
+      addition: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 0,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

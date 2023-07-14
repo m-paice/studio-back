@@ -9,8 +9,7 @@ export type ScheduleInstance = {
   accountId: string;
   user: UserInstance;
   userId: string;
-  service: ServiceInstance;
-  serviceId: string;
+  services: ServiceInstance[] | string[];
   employee: UserInstance;
   employeeId: string;
   scheduleAt: Date;
@@ -20,6 +19,9 @@ export type ScheduleInstance = {
   isPackage: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+
+  addService(data: ServiceInstance, options?): void;
+  removeService(data: ServiceInstance, options?): void;
 };
 
 const Schedule = sequelize.define(
@@ -62,9 +64,10 @@ Schedule.associate = (models) => {
     as: 'user',
   });
 
-  Schedule.belongsTo(models.Services, {
-    foreignKey: 'serviceId',
-    as: 'service',
+  Schedule.belongsToMany(models.Services, {
+    foreignKey: 'scheduleId',
+    through: models.ServiceSchedule,
+    as: 'services',
   });
 
   Schedule.belongsTo(models.Users, {

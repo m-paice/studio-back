@@ -7,6 +7,13 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
+      accountId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'accounts',
+          key: 'id',
+        },
+      },
       productId: {
         type: Sequelize.UUID,
         allowNull: false,

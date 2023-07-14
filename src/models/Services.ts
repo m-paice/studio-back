@@ -51,8 +51,9 @@ Service.associate = (models) => {
     foreignKey: 'accountId',
     as: 'account',
   });
-  Service.hasMany(models.Schedules, {
+  Service.belongsToMany(models.Schedules, {
     foreignKey: 'serviceId',
+    through: models.ServiceSchedule,
     as: 'schedules',
   });
 
