@@ -6,7 +6,7 @@ import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const whiteList = ['user', 'service', 'employee'];
+const whiteList = ['user', 'services', 'employee'];
 
 const controller = controllerDefaut(schedulesResource, whiteList);
 
