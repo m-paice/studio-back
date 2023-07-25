@@ -5,6 +5,7 @@ import { ScheduleInstance } from '../models/Schedules';
 import ReportResource from './Reports';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
 import ServiceResource from './Services';
+import ServiceSchedule from '../models/ServiceSchedule';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -35,6 +36,20 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
       data,
       options
     );
+
+    // apagar todos os serviços desse agendamento
+    await ServiceSchedule.destroy({ where: { scheduleId: schedule.id } });
+
+    // criar novos serviços
+    if (data.services?.length) {
+      await Promise.all(
+        data.services.map(async (item) => {
+          const service = await ServiceResource.findById(item);
+
+          await schedule.addService(service);
+        })
+      );
+    }
 
     const report = await ReportResource.findOne({
       where: {
