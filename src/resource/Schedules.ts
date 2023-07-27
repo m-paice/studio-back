@@ -84,15 +84,15 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
       status,
     });
 
-    if (status === 'finished' && !scheduleUpdated.isPackage) {
-      await ReportResource.createOrUpdate({
-        scheduleId: scheduleUpdated.id,
-        serviceId: scheduleUpdated.serviceId,
-        addition: scheduleUpdated.addition,
-        discount: scheduleUpdated.discount,
-        accountId,
-      });
-    }
+    // if (status === 'finished' && !scheduleUpdated.isPackage) {
+    //   await ReportResource.createOrUpdate({
+    //     scheduleId: scheduleUpdated.id,
+    //     serviceId: scheduleUpdated.serviceId,
+    //     addition: scheduleUpdated.addition,
+    //     discount: scheduleUpdated.discount,
+    //     accountId,
+    //   });
+    // }
 
     return true;
   }
