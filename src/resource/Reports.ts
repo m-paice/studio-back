@@ -175,22 +175,24 @@ export class ReportResource extends BaseResource<ReportInstance> {
 
   async createOrUpdate({
     reportId = null,
-    serviceId,
+    servicesId,
     scheduleId,
     discount,
     addition,
     accountId,
   }: {
     reportId?: string | null;
-    serviceId: string;
+    servicesId: string[];
     scheduleId: string;
     discount: number;
     addition: number;
     accountId: string;
   }) {
-    const service = await ServiceResource.findById(serviceId);
+    const services = await ServiceResource.findMany({
+      where: { id: { $in: servicesId } },
+    });
 
-    let total = service.price;
+    let total = services.reduce((acc, cur) => acc + cur.price, 0);
 
     if (discount) {
       total -= discount;

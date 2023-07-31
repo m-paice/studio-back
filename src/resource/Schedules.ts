@@ -1,4 +1,3 @@
-import { CreateOptions } from 'sequelize';
 import BaseResource from './BaseResource';
 import ScheduleRepository from '../repository/Schedules';
 import { ScheduleInstance } from '../models/Schedules';
@@ -57,10 +56,14 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
       },
     });
 
+    const schduleServices = await ScheduleRepository.findById(id, {
+      include: ['services'],
+    });
+
     if (report) {
       await ReportResource.createOrUpdate({
         scheduleId: scheduleUpdated.id,
-        serviceId: scheduleUpdated.serviceId,
+        servicesId: schduleServices.services.map((item) => item.id),
         addition: scheduleUpdated.addition,
         discount: scheduleUpdated.discount,
         reportId: report.id,
@@ -80,19 +83,21 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
     status: 'pending' | 'finished' | 'canceled';
     accountId: string;
   }) {
-    const scheduleUpdated = await ScheduleRepository.updateById(id, {
-      status,
+    const scheduleUpdated = await ScheduleRepository.updateById(id, { status });
+
+    const schduleServices = await ScheduleRepository.findById(id, {
+      include: ['services'],
     });
 
-    // if (status === 'finished' && !scheduleUpdated.isPackage) {
-    //   await ReportResource.createOrUpdate({
-    //     scheduleId: scheduleUpdated.id,
-    //     serviceId: scheduleUpdated.serviceId,
-    //     addition: scheduleUpdated.addition,
-    //     discount: scheduleUpdated.discount,
-    //     accountId,
-    //   });
-    // }
+    if (status === 'finished' && !scheduleUpdated.isPackage) {
+      await ReportResource.createOrUpdate({
+        scheduleId: scheduleUpdated.id,
+        servicesId: schduleServices.services.map((item) => item.id),
+        addition: scheduleUpdated.addition,
+        discount: scheduleUpdated.discount,
+        accountId,
+      });
+    }
 
     return true;
   }
