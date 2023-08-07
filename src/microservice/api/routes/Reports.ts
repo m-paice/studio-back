@@ -5,8 +5,28 @@ import reportsResource from '../../../resource/Reports';
 import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
+import Users from '../../../models/Users';
+import Schedules from '../../../models/Schedules';
+import Services from '../../../models/Services';
 
-const controller = controllerDefaut(reportsResource);
+const controller = controllerDefaut(reportsResource, [
+  {
+    model: Schedules,
+    as: 'schedule',
+    include: [
+      {
+        model: Users,
+        as: 'user',
+        attributes: ['name'],
+      },
+      {
+        model: Services,
+        as: 'services',
+        attributes: ['name'],
+      },
+    ],
+  },
+]);
 
 const controllerCustom = {
   reports: promiseHandler(async (req) => {

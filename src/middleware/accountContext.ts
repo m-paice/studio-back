@@ -22,5 +22,5 @@ export function accountContext(
     accountId: req.accountId,
   };
 
-  next();
+  return next();
 }

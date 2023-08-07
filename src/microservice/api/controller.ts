@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
+import { Includeable } from 'sequelize';
 
-export default <T>(resource: any, whiteList?: string[]) => {
+export default <T>(
+  resource: any,
+  whiteList?: string[] | Includeable | Includeable[]
+) => {
   const many = async (req: Request, res: Response) => {
     const { query } = req;
 
