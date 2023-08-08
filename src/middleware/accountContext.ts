@@ -1,8 +1,7 @@
-import { NextFunction, Response } from 'express';
-import { IRequest } from './auth';
+import { NextFunction, Request, Response } from 'express';
 
 export function accountContext(
-  req: IRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {

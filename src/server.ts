@@ -14,8 +14,6 @@ import routesApi from './microservice/api/routes';
 // middleware
 import { limiter } from './middleware/rateLimit';
 
-dotenv.config();
-
 class Server {
   private express: Express;
 
@@ -26,6 +24,7 @@ class Server {
   constructor() {
     this.express = express();
     this.logger = debug('@server');
+    dotenv.config();
   }
 
   async init() {

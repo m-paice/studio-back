@@ -1,9 +1,8 @@
-import { Router, Request, Response, NextFunction } from 'express';
 import { ServerResponse } from 'http';
-import { IRequest } from '../middleware/auth';
+import { Request, Response, NextFunction } from 'express';
 
 type HandlerFunction = (
-  req: IRequest,
+  req: Request,
   res: Response,
   next?: NextFunction
 ) => Promise<any> | ServerResponse | any;
