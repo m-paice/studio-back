@@ -1,4 +1,4 @@
-FROM node:12.2.0-alpine as production 
+FROM node:16.20.1-alpine as production 
 #also say 
 WORKDIR /app
 #copy the back app to the container

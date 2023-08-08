@@ -1,5 +1,9 @@
+import debug from 'debug';
+
 import sequelize from './sequelize';
 import models from '../models';
+
+const logger = debug('@sequelize');
 
 let associated = false;
 
@@ -13,8 +17,17 @@ export const initAssociations = () => {
 };
 
 export const start = () => {
-  initAssociations();
-  return models;
+  sequelize
+    .authenticate()
+    .then(() => {
+      initAssociations();
+      logger('db is ready');
+    })
+    .catch((error) => {
+      logger('db is error', {
+        message: error,
+      });
+    });
 };
 
 export const destroy = () => sequelize.close();

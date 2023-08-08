@@ -3,14 +3,16 @@ import express, { Express } from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import debug from 'debug';
 
 import routes from './routes';
-import routesApi from './microservice/api/routes';
-import setupSequelize from './services/setupSequelize';
 
+// services
+import setupSequelize from './services/setupSequelize';
 // microservices
-import Workers from './microservice/workers/App';
-import EventsEmitters from './microservice/emitters/App';
+import routesApi from './microservice/api/routes';
+// middleware
+import { limiter } from './middleware/rateLimit';
 
 dotenv.config();
 
@@ -19,22 +21,21 @@ class Server {
 
   private PORT = process.env.PORT;
 
+  private logger: debug.Debugger;
+
   constructor() {
     this.express = express();
-
-    this.init();
+    this.logger = debug('@server');
   }
 
-  init() {
+  async init() {
     this.middlewares();
     this.routes();
-    this.database();
+    await this.database();
 
-    this.express.listen(this.PORT, () =>
-      console.log(`server online in port ${this.PORT}`)
-    );
-
-    this.microservices();
+    this.express.listen(this.PORT, () => {
+      this.logger(`server listening on port ${this.PORT}`);
+    });
   }
 
   async database() {
@@ -47,20 +48,14 @@ class Server {
     this.express.use(bodyParser.json({ limit: '50mb' }));
     this.express.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     this.express.use(express.urlencoded({ extended: true }));
+    this.express.use(limiter);
   }
 
   routes() {
     this.express.use(routes);
     this.express.use('/api/v1', routesApi);
   }
-
-  microservices() {
-    const workers = new Workers();
-    const eventEmitters = new EventsEmitters();
-
-    workers.onStart();
-    eventEmitters.onStart();
-  }
 }
 
 const server = new Server();
+server.init();
