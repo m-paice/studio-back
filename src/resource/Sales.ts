@@ -16,7 +16,10 @@ interface Products {
 
 export class SalesResource extends BaseResource<SalesInstance> {
   constructor() {
-    super(SalesRepository);
+    super({
+      repository: SalesRepository,
+      entity: 'Sales',
+    });
   }
 
   getTotal(data: { products: Products[] }) {

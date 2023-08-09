@@ -12,7 +12,10 @@ interface Data extends Partial<CategoryInstance> {
 
 export class CategoriesResource extends BaseResource<CategoryInstance> {
   constructor() {
-    super(CategoriesRepository);
+    super({
+      repository: CategoriesRepository,
+      entity: 'Categories',
+    });
   }
 
   async findCategoryByName(name, query) {

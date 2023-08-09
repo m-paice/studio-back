@@ -10,7 +10,10 @@ import Schedules from '../models/Schedules';
 
 export class ReportResource extends BaseResource<ReportInstance> {
   constructor() {
-    super(ReportRepository);
+    super({
+      repository: ReportRepository,
+      entity: 'Report',
+    });
   }
 
   async saleReports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {

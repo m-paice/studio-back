@@ -4,7 +4,10 @@ import BaseResource from './BaseResource';
 
 export class PaymentsResource extends BaseResource<PaymentsInstance> {
   constructor() {
-    super(PaymentsRepository);
+    super({
+      repository: PaymentsRepository,
+      entity: 'Payments',
+    });
   }
 
   async createOrUpdate(saleId, data) {

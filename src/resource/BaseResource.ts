@@ -1,25 +1,40 @@
 import { pick } from 'lodash';
+import debug from 'debug';
 import { Options, FindOptions, CreateOptions } from 'sequelize';
 import BaseSequelizeRepository from '../repository/BaseRepository';
 
 import eventEmitters from '../services/eventEmitters';
 
+const logger = debug('@base_controller');
+
 export const CREATED = 'created';
 export const UPDATED = 'updated';
 export const DESTROYED = 'destroyed';
-
-export type Instance = {
-  id: string;
-};
 
 export interface IOptions<T> extends FindOptions<T> {
   dontEmit?: boolean;
 }
 
+interface CallbackOnCreateParams<T> {
+  id: string;
+  new: T;
+  body: unknown;
+}
+
+export type Instance = {
+  id: string;
+};
+
 type PaginatedOptions<T> = IOptions<T> & {
   page?: number | string;
   perPage?: number | string;
 };
+
+interface BaseControllerOptions<T> {
+  repository: BaseSequelizeRepository<T>;
+  entity: string;
+  onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
+}
 
 export default class BaseResource<TModel extends Instance> {
   protected readonly repository: BaseSequelizeRepository<TModel>;
@@ -28,10 +43,14 @@ export default class BaseResource<TModel extends Instance> {
 
   protected events: string[];
 
-  constructor(repository: BaseSequelizeRepository<TModel>, entity = 'none') {
-    this.repository = repository;
-    this.entity = entity;
+  public onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
+
+  constructor(options: BaseControllerOptions<TModel>) {
+    this.repository = options.repository;
+    this.entity = options.entity;
     this.events = [CREATED, UPDATED, DESTROYED];
+
+    this.onCreated = options.onCreated;
 
     this.getRepository = this.getRepository.bind(this);
     this.findManyPaginated = this.findManyPaginated.bind(this);
@@ -135,12 +154,29 @@ export default class BaseResource<TModel extends Instance> {
     return this.getRepository().count(query);
   }
 
-  create(data: Partial<TModel>, options?: CreateOptions): Promise<TModel> {
+  create(
+    data: Partial<TModel>,
+    options?: CreateOptions
+  ): Promise<TModel | void> {
     return this.getRepository()
       .create(data, options)
       .then((response) => {
-        this.emitCreated(response);
+        if (this.onCreated) {
+          this.onCreated({ id: response.id, new: response, body: data })
+            .then(() => response)
+            .catch((errorCallback) => {
+              logger('error on callback create: ', {
+                error: errorCallback,
+              });
+            });
+        }
+
         return response;
+      })
+      .catch((error) => {
+        logger('error on create: ', {
+          error,
+        });
       });
   }
 

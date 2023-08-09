@@ -5,7 +5,10 @@ import BaseResource from './BaseResource';
 
 export class UserResource extends BaseResource<UserInstance> {
   constructor() {
-    super(UserRepository);
+    super({
+      repository: UserRepository,
+      entity: 'User',
+    });
   }
 
   async findUserByName(name, query) {

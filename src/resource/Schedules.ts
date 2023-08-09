@@ -8,23 +8,22 @@ import ServiceSchedule from '../models/ServiceSchedule';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
-    super(ScheduleRepository);
-  }
+    super({
+      entity: 'schedule',
+      repository: ScheduleRepository,
+      onCreated: async (props) => {
+        const body = props.body as { services: string[] };
+        const newRecord = props.new as ScheduleInstance;
 
-  async create(data: Partial<ScheduleInstance>): Promise<ScheduleInstance> {
-    const schedule = await ScheduleRepository.create(data);
+        if (body.services?.length) {
+          await queuedAsyncMap(body.services, async (item) => {
+            const service = await ServiceResource.findById(item);
 
-    if (data.services?.length) {
-      await Promise.all(
-        data.services.map(async (item) => {
-          const service = await ServiceResource.findById(item);
-
-          await schedule.addService(service);
-        })
-      );
-    }
-
-    return schedule;
+            await newRecord.addService(service);
+          });
+        }
+      },
+    });
   }
 
   async updateScheduleById(id, data, options?) {

@@ -4,7 +4,10 @@ import BaseResource from './BaseResource';
 
 export class HistoricPriceResource extends BaseResource<HistoricPriceInstance> {
   constructor() {
-    super(HistoricPriceRepository);
+    super({
+      repository: HistoricPriceRepository,
+      entity: 'HistoricPrice',
+    });
   }
 
   async historicPricesOfProductId(productId) {

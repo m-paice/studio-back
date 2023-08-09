@@ -6,7 +6,10 @@ import BaseResource from './BaseResource';
 
 export class AccountsResource extends BaseResource<AccountInstance> {
   constructor() {
-    super(AccountsRepository);
+    super({
+      repository: AccountsRepository,
+      entity: 'Accounts',
+    });
   }
 
   async findAccountByName(name, query) {

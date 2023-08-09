@@ -13,7 +13,10 @@ interface Data extends Partial<ServiceInstance> {
 
 export class ServiceResource extends BaseResource<ServiceInstance> {
   constructor() {
-    super(ServiceRepository);
+    super({
+      repository: ServiceRepository,
+      entity: 'Service',
+    });
   }
 
   async findServiceByName(name, query) {

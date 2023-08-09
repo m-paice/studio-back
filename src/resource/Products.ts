@@ -7,7 +7,10 @@ import queuedAsyncMap from '../utils/queuedAsyncMap';
 
 export class ProductResource extends BaseResource<ProductInstance> {
   constructor() {
-    super(ProductRepository, 'products');
+    super({
+      repository: ProductRepository,
+      entity: 'Product',
+    });
   }
 
   async findProductByName(name, query) {
