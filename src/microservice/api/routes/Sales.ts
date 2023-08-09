@@ -14,7 +14,7 @@ const controllerCustom = {
   updateSaleById: promiseHandler(async (req) => {
     const response = await salesResource.updateSaleById(
       req.params.id,
-      req.body
+      req.body,
     );
 
     return response;

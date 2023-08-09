@@ -25,9 +25,9 @@ const ProductService = sequelize.define(
   },
   {
     tableName: 'product_service',
-  }
+  },
 );
 
-ProductService.associate = (models) => {};
+ProductService.associate = () => {};
 
 export default ProductService;

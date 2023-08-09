@@ -14,12 +14,9 @@ export class ProductResource extends BaseResource<ProductInstance> {
   }
 
   async findProductByName(name, query) {
-    const nameLower = sequelize.where(
-      sequelize.fn('lower', sequelize.col('name')),
-      {
-        [Op.like]: `%${name}%`,
-      }
-    );
+    const nameLower = sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+      [Op.like]: `%${name}%`,
+    });
 
     return ProductRepository.findMany({
       where: {
@@ -29,13 +26,10 @@ export class ProductResource extends BaseResource<ProductInstance> {
     });
   }
 
-  async destroyById(id: string, options?: sequelize.Options): Promise<any> {
-    const historicPricesOfProductId =
-      await HistoricPrice.historicPricesOfProductId(id);
+  async destroyById(id: string): Promise<any> {
+    const historicPricesOfProductId = await HistoricPrice.historicPricesOfProductId(id);
 
-    await queuedAsyncMap(historicPricesOfProductId, async (item) => {
-      return HistoricPrice.destroyById(item.id);
-    });
+    await queuedAsyncMap(historicPricesOfProductId, async (item) => HistoricPrice.destroyById(item.id));
 
     const product = await this.findById(id);
 

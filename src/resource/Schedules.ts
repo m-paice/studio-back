@@ -32,7 +32,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
     const scheduleUpdated = await ScheduleRepository.update(
       schedule,
       data,
-      options
+      options,
     );
 
     // apagar todos os serviços desse agendamento
@@ -45,7 +45,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           const service = await ServiceResource.findById(item);
 
           await schedule.addService(service);
-        })
+        }),
       );
     }
 

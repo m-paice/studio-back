@@ -23,7 +23,7 @@ export class CategoriesResource extends BaseResource<CategoryInstance> {
       sequelize.fn('lower', sequelize.col('name')),
       {
         [Op.like]: `%${name}%`,
-      }
+      },
     );
 
     return CategoriesRepository.findMany({

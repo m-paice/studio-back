@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 export function accountContext(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   if (req.isSuperAdmin) return next();
 

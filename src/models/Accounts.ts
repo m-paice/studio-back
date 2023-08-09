@@ -31,9 +31,9 @@ const Account = sequelize.define(
   },
   {
     tableName: 'accounts',
-  }
+  },
 );
 
-Account.associate = (models) => {};
+Account.associate = () => {};
 
 export default Account;

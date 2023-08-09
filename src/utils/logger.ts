@@ -15,17 +15,13 @@ function getRequestLogFormatter() {
   return combine(
     timestamp(),
     printf((info: any) => {
-      const { req, res } = info.message;
-      return `${info.timestamp} ${info.level}: ${req.hostname}${
-        req.port || ''
-      }${req.originalUrl}`;
-    })
+      const { req } = info.message;
+      return `${info.timestamp} ${info.level}: ${req.hostname}${req.port || ''}${req.originalUrl}`;
+    }),
   );
 }
 
-function createRequestLogger(
-  transports: winston.transports.ConsoleTransportInstance[]
-) {
+function createRequestLogger(transports: winston.transports.ConsoleTransportInstance[]) {
   const requestLogger = winston.createLogger({
     format: getRequestLogFormatter(),
     transports,
@@ -38,22 +34,14 @@ function createRequestLogger(
 }
 
 function createErrorLogger(
-  transports: [
-    winston.transports.HttpTransportInstance,
-    winston.transports.ConsoleTransportInstance
-  ]
+  transports: [winston.transports.HttpTransportInstance, winston.transports.ConsoleTransportInstance],
 ) {
   const errLogger = winston.createLogger({
     level: 'error',
     transports,
   });
 
-  return function logError(
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  return function logError(err: any, req: Request, res: Response, next: NextFunction) {
     errLogger.error({ err, req, res });
     next();
   };
@@ -70,10 +58,7 @@ const logConfiguration = {
       label: CATEGORY,
     }),
     winston.format.timestamp(),
-    winston.format.printf(
-      (info) =>
-        `${info.timestamp} - ${info.label}:[${info.level}]: ${info.message}`
-    )
+    winston.format.printf((info) => `${info.timestamp} - ${info.label}:[${info.level}]: ${info.message}`),
   ),
 };
 

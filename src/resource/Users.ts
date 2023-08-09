@@ -16,7 +16,7 @@ export class UserResource extends BaseResource<UserInstance> {
       sequelize.fn('lower', sequelize.col('name')),
       {
         [Op.like]: `%${name}%`,
-      }
+      },
     );
 
     return UserRepository.findMany({

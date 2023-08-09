@@ -60,8 +60,7 @@ export class SalesResource extends BaseResource<SalesInstance> {
     await queuedAsyncMap<Products, void>(data.products, async (item) => {
       const product = await ProductResource.findById(item.id);
 
-      const subtotal =
-        item.amount * product.price - item.discount + item.addition;
+      const subtotal = item.amount * product.price - item.discount + item.addition;
 
       await saleCreated.addProduct(product, {
         through: {
@@ -84,7 +83,7 @@ export class SalesResource extends BaseResource<SalesInstance> {
     return saleCreated;
   }
 
-  async updateSaleById(id, data, options = {}) {
+  async updateSaleById(id, data) {
     const total = this.getTotal(data);
 
     const oldSale = await SalesRepository.findById(id, { include: 'products' });
@@ -103,8 +102,7 @@ export class SalesResource extends BaseResource<SalesInstance> {
     await queuedAsyncMap<Products, void>(data.products, async (item) => {
       const product = await ProductResource.findById(item.id);
 
-      const subtotal =
-        item.amount * product.price - item.discount + item.addition;
+      const subtotal = item.amount * product.price - item.discount + item.addition;
 
       await saleUpdated.addProduct(product, {
         through: {

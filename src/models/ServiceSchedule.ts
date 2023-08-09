@@ -25,9 +25,9 @@ const ServiceSchedule = sequelize.define(
   },
   {
     tableName: 'service_schedule',
-  }
+  },
 );
 
-ServiceSchedule.associate = (models) => {};
+ServiceSchedule.associate = () => {};
 
 export default ServiceSchedule;

@@ -37,7 +37,7 @@ const Payments = sequelize.define(
   },
   {
     tableName: 'payments',
-  }
+  },
 );
 
 Payments.associate = (models) => {

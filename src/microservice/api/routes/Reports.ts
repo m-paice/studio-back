@@ -38,7 +38,7 @@ const controllerCustom = {
           startAt: new Date(startAt),
           endAt: new Date(endAt),
         },
-        req.query
+        req.query,
       );
 
       return response;
@@ -49,7 +49,7 @@ const controllerCustom = {
         startAt: new Date(startAt),
         endAt: new Date(endAt),
       },
-      req.query
+      req.query,
     );
 
     return response;

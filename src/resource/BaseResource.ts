@@ -156,7 +156,7 @@ export default class BaseResource<TModel extends Instance> {
 
   create(
     data: Partial<TModel>,
-    options?: CreateOptions
+    options?: CreateOptions,
   ): Promise<TModel | void> {
     return this.getRepository()
       .create(data, options)
@@ -185,7 +185,7 @@ export default class BaseResource<TModel extends Instance> {
     data: Partial<TModel>,
     options: IOptions<TModel> = {
       dontEmit: false,
-    }
+    },
   ) {
     return this.getRepository()
       .update(model, data, options)
@@ -200,7 +200,7 @@ export default class BaseResource<TModel extends Instance> {
     data: Partial<TModel>,
     options: IOptions<TModel> = {
       dontEmit: false,
-    }
+    },
   ) {
     return this.getRepository()
       .findById(id, options)

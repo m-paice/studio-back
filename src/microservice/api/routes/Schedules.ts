@@ -33,7 +33,7 @@ const controllerCustom = {
 
     const response = await schedulesResource.updateScheduleById(
       req.params.id,
-      payload
+      payload,
     );
 
     return response;

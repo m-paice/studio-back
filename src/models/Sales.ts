@@ -38,7 +38,7 @@ const Sales = sequelize.define(
   },
   {
     tableName: 'sales',
-  }
+  },
 );
 
 Sales.associate = (models) => {

@@ -1,4 +1,4 @@
-import sequelize, { Op } from 'sequelize';
+import { Op } from 'sequelize';
 import ReportRepository from '../repository/Reports';
 import { ReportInstance } from '../models/Reports';
 import BaseResource from './BaseResource';
@@ -27,16 +27,14 @@ export class ReportResource extends BaseResource<ReportInstance> {
     });
 
     const response = reports.reduce(
-      (acc, cur) => {
-        return {
-          entry: acc['entry'] + cur.entry,
-          out: acc['out'] + cur.out,
-        };
-      },
+      (acc, cur) => ({
+        entry: acc.entry + cur.entry,
+        out: acc.out + cur.out,
+      }),
       {
         entry: 0,
         out: 0,
-      }
+      },
     );
 
     return {
@@ -75,16 +73,14 @@ export class ReportResource extends BaseResource<ReportInstance> {
     });
 
     const response = reports.reduce(
-      (acc, cur) => {
-        return {
-          entry: acc['entry'] + cur.entry,
-          out: acc['out'] + cur.out,
-        };
-      },
+      (acc, cur) => ({
+        entry: acc.entry + cur.entry,
+        out: acc.out + cur.out,
+      }),
       {
         entry: 0,
         out: 0,
-      }
+      },
     );
 
     const countFinished = await ScheduleResource.count({
@@ -222,11 +218,7 @@ export class ReportResource extends BaseResource<ReportInstance> {
     });
   }
 
-  async registerOut(data: {
-    description: string;
-    value: number;
-    accountId: string;
-  }) {
+  async registerOut(data: { description: string; value: number; accountId: string }) {
     return ReportRepository.create({
       accountId: data.accountId,
       out: data.value,

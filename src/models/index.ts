@@ -25,5 +25,5 @@ export default {
   Sales,
   ProductSale,
   Payments,
-  ServiceSchedule
+  ServiceSchedule,
 };

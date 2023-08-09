@@ -40,7 +40,7 @@ const Product = sequelize.define(
   },
   {
     tableName: 'products',
-  }
+  },
 );
 
 Product.associate = (models) => {

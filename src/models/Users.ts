@@ -40,7 +40,7 @@ const User = sequelize.define(
   },
   {
     tableName: 'users',
-  }
+  },
 );
 
 User.associate = (models) => {

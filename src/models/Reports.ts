@@ -40,7 +40,7 @@ const Report = sequelize.define(
   },
   {
     tableName: 'reports',
-  }
+  },
 );
 
 Report.associate = (models) => {

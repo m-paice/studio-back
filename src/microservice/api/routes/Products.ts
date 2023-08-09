@@ -14,7 +14,7 @@ const controllerCustom = {
   findByName: promiseHandler(async (req) => {
     const response = await productResource.findProductByName(
       req.params.name,
-      req.query
+      req.query,
     );
 
     return response;

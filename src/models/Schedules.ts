@@ -51,7 +51,7 @@ const Schedule = sequelize.define(
   },
   {
     tableName: 'schedules',
-  }
+  },
 );
 
 Schedule.associate = (models) => {

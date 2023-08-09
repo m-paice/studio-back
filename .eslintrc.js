@@ -28,6 +28,7 @@ module.exports = {
       },
     ],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'max-len': ['error', { code: 120 }],
   },
   settings: {
     'import/resolver': {

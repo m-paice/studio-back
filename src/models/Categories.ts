@@ -30,7 +30,7 @@ const Category = sequelize.define(
   },
   {
     tableName: 'categories',
-  }
+  },
 );
 
 Category.associate = (models) => {

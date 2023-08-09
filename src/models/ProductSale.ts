@@ -33,9 +33,9 @@ const ProductSale = sequelize.define(
   },
   {
     tableName: 'product_sale',
-  }
+  },
 );
 
-ProductSale.associate = (models) => {};
+ProductSale.associate = () => {};
 
 export default ProductSale;

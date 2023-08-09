@@ -17,7 +17,7 @@ export class AccountsResource extends BaseResource<AccountInstance> {
       sequelize.fn('lower', sequelize.col('name')),
       {
         [Op.like]: `%${name}%`,
-      }
+      },
     );
 
     return AccountsRepository.findMany({

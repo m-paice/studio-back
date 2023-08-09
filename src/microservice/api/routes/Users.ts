@@ -14,7 +14,7 @@ const controllerCustom = {
   findByName: promiseHandler(async (req) => {
     const response = await usersResource.findUserByName(
       req.params.name,
-      req.query
+      req.query,
     );
 
     return response;
@@ -22,7 +22,7 @@ const controllerCustom = {
   findEmployeeByName: promiseHandler(async (req) => {
     const response = await usersResource.findUserEmployeeByName(
       req.params.name,
-      req.query
+      req.query,
     );
 
     return response;

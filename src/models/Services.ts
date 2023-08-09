@@ -43,7 +43,7 @@ const Service = sequelize.define(
   },
   {
     tableName: 'services',
-  }
+  },
 );
 
 Service.associate = (models) => {

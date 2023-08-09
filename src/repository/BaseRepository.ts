@@ -1,11 +1,4 @@
-import {
-  Model,
-  Options,
-  FindOptions,
-  CreateOptions,
-  UpdateOptions,
-  DestroyOptions,
-} from 'sequelize';
+import { Options, FindOptions, CreateOptions } from 'sequelize';
 
 class BaseRepository<T> {
   private readonly model: any;
@@ -39,9 +32,7 @@ class BaseRepository<T> {
   }
 
   updateById(id: string, data: Partial<T>, options?: Options): Promise<T> {
-    return this.findById(id, options).then((model) =>
-      this.update(model, data, options)
-    );
+    return this.findById(id, options).then((model) => this.update(model, data, options));
   }
 
   destroy(model: any, options: Options) {
@@ -49,9 +40,7 @@ class BaseRepository<T> {
   }
 
   destroyById(id: string, options: Options) {
-    return this.findById(id, options).then((model) =>
-      this.destroy(model, options)
-    );
+    return this.findById(id, options).then((model) => this.destroy(model, options));
   }
 }
 

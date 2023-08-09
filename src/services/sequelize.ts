@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
     host: config.host,
     port: config.port,
     logging: false,
-  }
+  },
 );
 
 export default sequelize;

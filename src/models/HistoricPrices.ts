@@ -32,7 +32,7 @@ const HistoricPrice = sequelize.define(
   },
   {
     tableName: 'historic_prices',
-  }
+  },
 );
 
 HistoricPrice.associate = (models) => {
