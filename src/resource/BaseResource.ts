@@ -21,6 +21,10 @@ interface CallbackOnCreateParams<T> {
   body: unknown;
 }
 
+interface CallbackOnDeletedParams<T> {
+  id: string;
+}
+
 export type Instance = {
   id: string;
 };
@@ -34,6 +38,7 @@ interface BaseControllerOptions<T> {
   repository: BaseSequelizeRepository<T>;
   entity: string;
   onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
+  onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
 }
 
 export default class BaseResource<TModel extends Instance> {
@@ -45,12 +50,15 @@ export default class BaseResource<TModel extends Instance> {
 
   public onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
 
+  onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
+
   constructor(options: BaseControllerOptions<TModel>) {
     this.repository = options.repository;
     this.entity = options.entity;
     this.events = [CREATED, UPDATED, DESTROYED];
 
     this.onCreated = options.onCreated;
+    this.onDeleted = options.onDeleted;
 
     this.getRepository = this.getRepository.bind(this);
     this.findManyPaginated = this.findManyPaginated.bind(this);
@@ -107,7 +115,7 @@ export default class BaseResource<TModel extends Instance> {
   }
 
   async findManyPaginated(options: PaginatedOptions<TModel> = {}) {
-    const DEFAULT_PER_PAGE = 10;
+    const DEFAULT_PER_PAGE = 3;
 
     const page = parseInt(`${options.page || '1'}`, 10);
     const perPage = parseInt(`${options.perPage || DEFAULT_PER_PAGE}`, 10);
@@ -154,21 +162,16 @@ export default class BaseResource<TModel extends Instance> {
     return this.getRepository().count(query);
   }
 
-  create(
-    data: Partial<TModel>,
-    options?: CreateOptions,
-  ): Promise<TModel | void> {
+  create(data: Partial<TModel>, options?: CreateOptions): Promise<TModel | void> {
     return this.getRepository()
       .create(data, options)
       .then((response) => {
         if (this.onCreated) {
-          this.onCreated({ id: response.id, new: response, body: data })
-            .then(() => response)
-            .catch((errorCallback) => {
-              logger('error on callback create: ', {
-                error: errorCallback,
-              });
+          this.onCreated({ id: response.id, new: response, body: data }).catch((errorCallback) => {
+            logger('error on callback create: ', {
+              error: errorCallback,
             });
+          });
         }
 
         return response;
@@ -207,15 +210,27 @@ export default class BaseResource<TModel extends Instance> {
       .then((model) => this.update(model, data, options));
   }
 
-  destroy(model: TModel, options: Options = {}) {
+  destroy(model: TModel, options: Options = {}): Promise<void> {
     return this.getRepository()
       .destroy(model, options)
-      .then(() => model);
+      .then(() => {});
   }
 
   destroyById(id: string, options: Options = {}) {
     return this.getRepository()
       .findById(id, options)
-      .then((model) => this.destroy(model, options));
+      .then((model) => {
+        this.destroy(model, options).then(() => {
+          if (this.onDeleted) {
+            this.onDeleted({ id }).catch((errorCallback) => {
+              logger('error on callback delete: ', {
+                error: errorCallback,
+              });
+            });
+          }
+        });
+
+        return true;
+      });
   }
 }

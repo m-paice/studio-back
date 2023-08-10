@@ -13,6 +13,7 @@ export type UserInstance = {
   birthDate: string;
   createdAt?: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 };
 
 const User = sequelize.define(
@@ -37,9 +38,13 @@ const User = sequelize.define(
       type: Sequelize.DATE,
       allowNull: false,
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+    },
   },
   {
     tableName: 'users',
+    paranoid: true,
   },
 );
 

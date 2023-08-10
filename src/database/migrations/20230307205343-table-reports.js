@@ -20,14 +20,9 @@ module.exports = {
           model: 'schedules',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
-      saleId: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'sales',
-          key: 'id',
-        },
-      },
+
       description: {
         type: Sequelize.STRING,
       },
@@ -40,6 +35,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
       },
     }),
 

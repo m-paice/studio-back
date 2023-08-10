@@ -23,17 +23,18 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           });
         }
       },
+      onDeleted: async ({ id }) => {
+        const reportsBySchedule = await ReportResource.findMany({ where: { scheduleId: id } });
+
+        await queuedAsyncMap(reportsBySchedule, async (item) => ReportResource.destroyById(item.id));
+      },
     });
   }
 
   async updateScheduleById(id, data, options?) {
     const schedule = await ScheduleRepository.findById(id);
 
-    const scheduleUpdated = await ScheduleRepository.update(
-      schedule,
-      data,
-      options,
-    );
+    const scheduleUpdated = await ScheduleRepository.update(schedule, data, options);
 
     // apagar todos os serviços desse agendamento
     await ServiceSchedule.destroy({ where: { scheduleId: schedule.id } });
