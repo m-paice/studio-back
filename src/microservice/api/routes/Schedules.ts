@@ -31,10 +31,7 @@ const controllerCustom = {
       accountId: req.accountId,
     };
 
-    const response = await schedulesResource.updateScheduleById(
-      req.params.id,
-      payload,
-    );
+    const response = await schedulesResource.updateScheduleById(req.params.id, payload);
 
     return response;
   }),
@@ -51,7 +48,7 @@ const router = Router();
 
 router.use(accountContext);
 
-router.get('/', controller.many);
+router.get('/', controller.index);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.delete('/:id', controller.destroy);
