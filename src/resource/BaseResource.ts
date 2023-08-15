@@ -25,6 +25,13 @@ interface CallbackOnDeletedParams<T> {
   id: string;
 }
 
+interface CallbackOnUpdateParams<T> {
+  id: string;
+  old: T;
+  new: T;
+  body: unknown;
+}
+
 export type Instance = {
   id: string;
 };
@@ -39,6 +46,7 @@ interface BaseControllerOptions<T> {
   entity: string;
   onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
   onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
+  onUpdated?: <T>(options: CallbackOnUpdateParams<T>) => Promise<void>;
 }
 
 export default class BaseResource<TModel extends Instance> {
@@ -48,9 +56,11 @@ export default class BaseResource<TModel extends Instance> {
 
   protected events: string[];
 
-  public onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
+  onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
 
   onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
+
+  onUpdated?: <T>(options: CallbackOnUpdateParams<T>) => Promise<void>;
 
   constructor(options: BaseControllerOptions<TModel>) {
     this.repository = options.repository;
@@ -59,6 +69,7 @@ export default class BaseResource<TModel extends Instance> {
 
     this.onCreated = options.onCreated;
     this.onDeleted = options.onDeleted;
+    this.onUpdated = options.onUpdated;
 
     this.getRepository = this.getRepository.bind(this);
     this.findManyPaginated = this.findManyPaginated.bind(this);
@@ -189,13 +200,10 @@ export default class BaseResource<TModel extends Instance> {
     options: IOptions<TModel> = {
       dontEmit: false,
     },
-  ) {
+  ): Promise<TModel> {
     return this.getRepository()
       .update(model, data, options)
-      .then((response) => {
-        if (!options.dontEmit) this.emitUpdated(response);
-        return response;
-      });
+      .then((response) => response);
   }
 
   updateById(
@@ -207,13 +215,28 @@ export default class BaseResource<TModel extends Instance> {
   ) {
     return this.getRepository()
       .findById(id, options)
-      .then((model) => this.update(model, data, options));
+      .then((model) =>
+        this.update(model, data, options).then((response) => {
+          if (this.onUpdated) {
+            this.onUpdated({
+              id,
+              new: response,
+              old: model,
+              body: data,
+            }).catch((errorCallback) => {
+              logger('error on callback update: ', {
+                error: errorCallback,
+              });
+            });
+          }
+
+          return response;
+        }),
+      );
   }
 
   destroy(model: TModel, options: Options = {}): Promise<void> {
-    return this.getRepository()
-      .destroy(model, options)
-      .then(() => {});
+    return this.getRepository().destroy(model, options);
   }
 
   destroyById(id: string, options: Options = {}) {

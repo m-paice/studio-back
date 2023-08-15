@@ -5,6 +5,7 @@ import schedulesResource from '../../../resource/Schedules';
 import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
+import { validatePayload } from '../../../middleware/validatePayload';
 
 const whiteList = ['user', 'services', 'employee'];
 
@@ -23,18 +24,7 @@ const controllerCustom = {
 
     return response;
   }),
-  updateById: promiseHandler(async (req) => {
-    const payload = {
-      ...req.body,
-      addition: Number(req.body.addition),
-      discount: Number(req.body.discount),
-      accountId: req.accountId,
-    };
 
-    const response = await schedulesResource.updateScheduleById(req.params.id, payload);
-
-    return response;
-  }),
   revert: promiseHandler(async (req) => {
     const { id } = req.params;
 
@@ -50,10 +40,10 @@ router.use(accountContext);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);
-router.post('/', controller.create);
+router.post('/', validatePayload, controller.create);
+router.put('/:id', validatePayload, controller.update);
 router.delete('/:id', controller.destroy);
 
-router.put('/:id', controllerCustom.updateById);
 router.put('/:id/status', controllerCustom.changeStatus);
 router.get('/:id/revert', controllerCustom.revert);
 
