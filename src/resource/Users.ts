@@ -2,22 +2,25 @@ import sequelize, { Op } from 'sequelize';
 import UserRepository from '../repository/Users';
 import { UserInstance } from '../models/Users';
 import BaseResource from './BaseResource';
+import AuthResource from './Auth';
 
 export class UserResource extends BaseResource<UserInstance> {
   constructor() {
     super({
       repository: UserRepository,
       entity: 'User',
+      onCreated: async ({ id, new: newRecord }) => {
+        const hash = await AuthResource.generateHash((newRecord as unknown as UserInstance).password);
+
+        await UserRepository.updateById(id, { password: hash });
+      },
     });
   }
 
   async findUserByName(name, query) {
-    const nameLower = sequelize.where(
-      sequelize.fn('lower', sequelize.col('name')),
-      {
-        [Op.like]: `%${name}%`,
-      },
-    );
+    const nameLower = sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+      [Op.like]: `%${name}%`,
+    });
 
     return UserRepository.findMany({
       where: {
