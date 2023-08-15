@@ -8,6 +8,7 @@ module.exports = {
           model: 'services',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
       scheduleId: {
         type: Sequelize.UUID,
@@ -16,11 +17,15 @@ module.exports = {
           model: 'schedules',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
       },
       updatedAt: {
+        type: Sequelize.DATE,
+      },
+      deletedAt: {
         type: Sequelize.DATE,
       },
     });

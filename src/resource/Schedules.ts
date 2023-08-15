@@ -23,54 +23,50 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           });
         }
       },
-    });
-  }
+      onUpdated: async (props) => {
+        const body = props.body as { services: string[] };
+        const newRecord = props.new as ScheduleInstance;
 
-  async updateScheduleById(id, data, options?) {
-    const schedule = await ScheduleRepository.findById(id);
+        // apagar todos os serviços desse agendamento
+        await ServiceSchedule.destroy({ where: { scheduleId: props.id } });
 
-    const scheduleUpdated = await ScheduleRepository.update(
-      schedule,
-      data,
-      options,
-    );
+        // criar novos serviços
+        if (body.services?.length) {
+          await Promise.all(
+            body.services.map(async (item) => {
+              const service = await ServiceResource.findById(item);
 
-    // apagar todos os serviços desse agendamento
-    await ServiceSchedule.destroy({ where: { scheduleId: schedule.id } });
+              await newRecord.addService(service);
+            }),
+          );
+        }
 
-    // criar novos serviços
-    if (data.services?.length) {
-      await Promise.all(
-        data.services.map(async (item) => {
-          const service = await ServiceResource.findById(item);
+        const report = await ReportResource.findOne({
+          where: { scheduleId: props.id },
+        });
 
-          await schedule.addService(service);
-        }),
-      );
-    }
+        // verificar se existe relatorio desse agendamento
+        if (report) {
+          const schedule = await ScheduleRepository.findById(props.id, {
+            include: ['services'],
+          });
 
-    const report = await ReportResource.findOne({
-      where: {
-        scheduleId: scheduleUpdated.id,
+          await ReportResource.createOrUpdate({
+            scheduleId: props.id,
+            servicesId: schedule.services.map((item) => item.id),
+            addition: Number(newRecord.addition),
+            discount: Number(newRecord.discount),
+            reportId: report.id,
+            accountId: schedule.accountId,
+          });
+        }
+      },
+      onDeleted: async ({ id }) => {
+        const reportsBySchedule = await ReportResource.findMany({ where: { scheduleId: id } });
+
+        await queuedAsyncMap(reportsBySchedule, async (item) => ReportResource.destroyById(item.id));
       },
     });
-
-    const schduleServices = await ScheduleRepository.findById(id, {
-      include: ['services'],
-    });
-
-    if (report) {
-      await ReportResource.createOrUpdate({
-        scheduleId: scheduleUpdated.id,
-        servicesId: schduleServices.services.map((item) => item.id),
-        addition: scheduleUpdated.addition,
-        discount: scheduleUpdated.discount,
-        reportId: report.id,
-        accountId: data.accountId,
-      });
-    }
-
-    return scheduleUpdated;
   }
 
   async changeStatus({

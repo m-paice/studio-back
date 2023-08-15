@@ -6,16 +6,13 @@ import { promiseHandler } from '../../../utils/routing';
 
 import controllerDefaut from '../controller';
 
-const whiteList = ['products'];
+const whiteList = [];
 
 const controller = controllerDefaut(servicesResource, whiteList);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await servicesResource.findServiceByName(
-      req.params.name,
-      req.query,
-    );
+    const response = await servicesResource.findServiceByName(req.params.name, req.query);
 
     return response;
   }),

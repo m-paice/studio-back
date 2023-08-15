@@ -22,9 +22,13 @@ const ServiceSchedule = sequelize.define(
       type: Sequelize.DATE,
       defaultValue: new Date(),
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+    },
   },
   {
     tableName: 'service_schedule',
+    paranoid: true,
   },
 );
 

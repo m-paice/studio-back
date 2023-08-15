@@ -12,18 +12,12 @@ const controller = controllerDefaut(usersResource, includeWhiteList);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await usersResource.findUserByName(
-      req.params.name,
-      req.query,
-    );
+    const response = await usersResource.findUserByName(req.params.name, req.query);
 
     return response;
   }),
   findEmployeeByName: promiseHandler(async (req) => {
-    const response = await usersResource.findUserEmployeeByName(
-      req.params.name,
-      req.query,
-    );
+    const response = await usersResource.findUserEmployeeByName(req.params.name, req.query);
 
     return response;
   }),
