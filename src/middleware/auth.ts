@@ -14,6 +14,8 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 
   if (!decoded) return res.sendStatus(401);
 
+  if (!decoded.accountId && decoded.isSuperAdmin) return next();
+
   // check account valid
   AccountsResource.findById(decoded.accountId).then((response) => {
     if (!response.enable) return res.status(401).json({ message: 'account blocked' });
