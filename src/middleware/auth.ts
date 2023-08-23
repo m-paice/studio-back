@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { VERIFY_TOKEN } from '../constants';
+import AccountsResource from '../resource/Accounts';
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
@@ -13,11 +14,16 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 
   if (!decoded) return res.sendStatus(401);
 
-  req.userId = decoded.userId;
-  req.accountId = decoded.accountId;
-  req.isSuperAdmin = decoded.isSuperAdmin;
+  // check account valid
+  AccountsResource.findById(decoded.accountId).then((response) => {
+    if (!response.enable) return res.status(401).json({ message: 'account blocked' });
 
-  return next();
+    req.userId = decoded.userId;
+    req.accountId = decoded.accountId;
+    req.isSuperAdmin = decoded.isSuperAdmin;
+
+    return next();
+  });
 };
 
 export const generateToken = ({

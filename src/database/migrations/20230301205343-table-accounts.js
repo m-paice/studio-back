@@ -13,6 +13,9 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
+      trial: Sequelize.BOOLEAN,
+      enable: Sequelize.BOOLEAN,
+      dueDate: Sequelize.DATE,
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
