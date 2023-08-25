@@ -13,9 +13,9 @@ export const onlyAdmin = (req: Request, res: Response, next: NextFunction) => {
 
   if (!decoded) return res.sendStatus(401);
 
-  if (decoded.accountId) res.status(401).send('only admin');
+  if (decoded.accountId) return res.status(401).send('only admin');
 
-  if (!decoded.isSuperAdmin) res.status(401).send('only admin');
+  if (!decoded.isSuperAdmin) return res.status(401).send('only admin');
 
   return next();
 };

@@ -126,9 +126,10 @@ export default class BaseResource<TModel extends Instance> {
   }
 
   async findManyPaginated(options: PaginatedOptions<TModel> = {}) {
-    const DEFAULT_PER_PAGE = 3;
+    const DEFAULT_PER_PAGE = 10;
+    const DEFAULT_PAGE = 1;
 
-    const page = parseInt(`${options.page || '1'}`, 10);
+    const page = parseInt(`${options.page || DEFAULT_PAGE}`, 10);
     const perPage = parseInt(`${options.perPage || DEFAULT_PER_PAGE}`, 10);
     const from = (page - 1) * perPage;
     const to = page * perPage;
@@ -215,24 +216,22 @@ export default class BaseResource<TModel extends Instance> {
   ) {
     return this.getRepository()
       .findById(id, options)
-      .then((model) =>
-        this.update(model, data, options).then((response) => {
-          if (this.onUpdated) {
-            this.onUpdated({
-              id,
-              new: response,
-              old: model,
-              body: data,
-            }).catch((errorCallback) => {
-              logger('error on callback update: ', {
-                error: errorCallback,
-              });
+      .then((model) => this.update(model, data, options).then((response) => {
+        if (this.onUpdated) {
+          this.onUpdated({
+            id,
+            new: response,
+            old: model,
+            body: data,
+          }).catch((errorCallback) => {
+            logger('error on callback update: ', {
+              error: errorCallback,
             });
-          }
+          });
+        }
 
-          return response;
-        }),
-      );
+        return response;
+      }));
   }
 
   destroy(model: TModel, options: Options = {}): Promise<void> {
