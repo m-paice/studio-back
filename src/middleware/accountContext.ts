@@ -1,12 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-export function accountContext(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  if (req.isSuperAdmin) return next();
-
+export function accountContext(req: Request, res: Response, next: NextFunction) {
   req.query = {
     ...req?.query,
     where: {
