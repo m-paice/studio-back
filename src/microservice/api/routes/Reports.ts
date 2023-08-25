@@ -32,18 +32,6 @@ const controllerCustom = {
   reports: promiseHandler(async (req) => {
     const { endAt, startAt } = req.body;
 
-    if (req?.body?.type === 'sales') {
-      const response = await reportsResource.saleReports(
-        {
-          startAt: new Date(startAt),
-          endAt: new Date(endAt),
-        },
-        req.query,
-      );
-
-      return response;
-    }
-
     const response = await reportsResource.reports(
       {
         startAt: new Date(startAt),

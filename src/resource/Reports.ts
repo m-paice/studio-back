@@ -1,11 +1,10 @@
 import { Op } from 'sequelize';
+
 import ReportRepository from '../repository/Reports';
 import { ReportInstance } from '../models/Reports';
 import BaseResource from './BaseResource';
 import ScheduleResource from './Schedules';
 import ServiceResource from './Services';
-import userResource from './Users';
-import queuedAsyncMap from '../utils/queuedAsyncMap';
 import Schedules from '../models/Schedules';
 
 export class ReportResource extends BaseResource<ReportInstance> {
@@ -14,40 +13,6 @@ export class ReportResource extends BaseResource<ReportInstance> {
       repository: ReportRepository,
       entity: 'Report',
     });
-  }
-
-  async saleReports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {
-    const reports = await ReportRepository.findMany({
-      where: {
-        createdAt: {
-          [Op.between]: [startAt, endAt],
-        },
-        ...query.where,
-      },
-    });
-
-    const response = reports.reduce(
-      (acc, cur) => ({
-        entry: acc.entry + cur.entry,
-        out: acc.out + cur.out,
-      }),
-      {
-        entry: 0,
-        out: 0,
-      },
-    );
-
-    return {
-      entry: response.entry,
-      out: response.out,
-      countFinished: 0,
-      countCanceled: 0,
-      countUsers: 0,
-      serviceCount: [],
-      productPriceSugestion: 0,
-      schedulesInfo: [],
-      registerInfo: reports,
-    };
   }
 
   async reports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {
@@ -99,55 +64,6 @@ export class ReportResource extends BaseResource<ReportInstance> {
       },
     });
 
-    const countUsers = await userResource.count({
-      where: {
-        ...query.where,
-        type: 'pf',
-        createdAt: {
-          [Op.between]: [startAt, endAt],
-        },
-      },
-    });
-
-    const services = await ServiceResource.findMany(query);
-
-    const serviceCount = await queuedAsyncMap(services, async (item) => {
-      const countService = await ScheduleResource.count({
-        where: {
-          ...defaultWhere,
-          ...query.where,
-          serviceId: item.id,
-        },
-      });
-
-      return { value: countService, item };
-    });
-
-    const fiveMaxService = serviceCount
-      .sort((a, b) => (a.value < b.value ? 1 : -1))
-      .slice(0, 5)
-      .map(({ item, value }) => ({ name: item.name, value }));
-
-    const productPriceSugestion = response.entry * 0.1;
-
-    const schedulesInfo = await ReportRepository.findMany({
-      ...query,
-      attributes: ['id'],
-      include: [
-        {
-          model: Schedules,
-          as: 'schedule',
-          attributes: ['id', 'discount', 'addition'],
-          include: ['service'],
-          where: {
-            ...defaultWhere,
-            ...query.where,
-            status: 'finished',
-          },
-        },
-      ],
-    });
-
     const registerOut = await ReportRepository.findMany({
       where: {
         createdAt: {
@@ -164,11 +80,6 @@ export class ReportResource extends BaseResource<ReportInstance> {
       out: response.out + valueRegisterOut,
       countFinished,
       countCanceled,
-      countUsers,
-      serviceCount: fiveMaxService,
-      productPriceSugestion,
-      schedulesInfo,
-      registerInfo: registerOut,
     };
   }
 
