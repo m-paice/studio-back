@@ -10,9 +10,13 @@ export class UserResource extends BaseResource<UserInstance> {
       repository: UserRepository,
       entity: 'User',
       onCreated: async ({ id, new: newRecord }) => {
-        const hash = await AuthResource.generateHash((newRecord as unknown as UserInstance).password);
+        const { password } = newRecord as unknown as UserInstance;
 
-        await UserRepository.updateById(id, { password: hash });
+        if (password) {
+          const hash = await AuthResource.generateHash(password);
+
+          await UserRepository.updateById(id, { password: hash });
+        }
       },
     });
   }
