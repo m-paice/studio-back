@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
 export function accountContext(req: Request, res: Response, next: NextFunction) {
+  if (!req.accountId) return next();
+
   req.query = {
     ...req?.query,
     where: {

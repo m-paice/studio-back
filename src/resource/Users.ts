@@ -18,6 +18,15 @@ export class UserResource extends BaseResource<UserInstance> {
           await UserRepository.updateById(id, { password: hash });
         }
       },
+      onUpdated: async ({ id, body }) => {
+        const payload = body as unknown as UserInstance;
+
+        if (payload.password) {
+          const hash = await AuthResource.generateHash(payload.password);
+
+          await UserRepository.updateById(id, { password: hash });
+        }
+      },
     });
   }
 
