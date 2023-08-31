@@ -1,13 +1,11 @@
-FROM node:16.20.1-alpine as production 
-#also say 
+FROM node:16.20.1-buster
+
 WORKDIR /app
-#copy the back app to the container
-COPY . /app/ 
-COPY .sequelizerc /app/
-
-#prepare the container for building back 
-RUN npm install --silent
-RUN npm run build 
-
 EXPOSE 3333
-CMD [ "npm", "start" ]
+
+COPY node_modules /app/node_modules/
+COPY package*.json /app/
+COPY .sequelizerc /app/
+COPY dist /app/dist/
+
+CMD ["npm", "start"]

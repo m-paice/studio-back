@@ -1,6 +1,7 @@
-node_modules
-
-.env
-
-uploads/*
-!uploads/.gitkeep
+Dockerfile
+docker-compose.yml
+.eslintrc.js
+.gitignore
+README.md
+tsconfig.json
+src
