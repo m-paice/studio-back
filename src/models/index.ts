@@ -2,9 +2,8 @@ import Services from './Services';
 import Users from './Users';
 import Schedules from './Schedules';
 import Reports from './Reports';
-
+import Billing from './Billings';
 import Accounts from './Accounts';
-
 import ServiceSchedule from './ServiceSchedule';
 
 export default {
@@ -12,8 +11,7 @@ export default {
   Users,
   Schedules,
   Reports,
-
+  Billing,
   Accounts,
-
   ServiceSchedule,
 };

@@ -2,23 +2,22 @@ import { Router } from 'express';
 
 import accountsResource from '../../../resource/Accounts';
 import { promiseHandler } from '../../../utils/routing';
-
 import controllerDefaut from '../controller';
+import { billing } from '../../../middleware/billing';
 
 const controller = controllerDefaut(accountsResource);
 
 const controllerCustom = {
   findByName: promiseHandler(async (req) => {
-    const response = await accountsResource.findAccountByName(
-      req.params.name,
-      req.query,
-    );
+    const response = await accountsResource.findAccountByName(req.params.name, req.query);
 
     return response;
   }),
 };
 
 const router = Router();
+
+router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

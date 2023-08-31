@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { accountContext } from '../../../middleware/accountContext';
 
 import schedulesResource from '../../../resource/Schedules';
 import { promiseHandler } from '../../../utils/routing';
-
 import controllerDefaut from '../controller';
 import { validatePayload } from '../../../middleware/validatePayload';
+import { accountContext } from '../../../middleware/accountContext';
+import { billing } from '../../../middleware/billing';
 
 const whiteList = ['user', 'services', 'employee'];
 
@@ -37,6 +37,7 @@ const controllerCustom = {
 const router = Router();
 
 router.use(accountContext);
+router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { accountContext } from '../../../middleware/accountContext';
 
 import usersResource from '../../../resource/Users';
 import { promiseHandler } from '../../../utils/routing';
-
 import controllerDefaut from '../controller';
+import { accountContext } from '../../../middleware/accountContext';
+import { billing } from '../../../middleware/billing';
 
 const includeWhiteList = ['account'];
 
@@ -26,6 +26,7 @@ const controllerCustom = {
 const router = Router();
 
 router.use(accountContext);
+router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

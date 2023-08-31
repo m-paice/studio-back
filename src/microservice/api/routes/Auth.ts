@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
 import AuthResource from '../../../resource/Auth';
-
 import { promiseHandler } from '../../../utils/routing';
 import auth from '../../../middleware/auth';
+import { billing } from '../../../middleware/billing';
 
 const router = Router();
 
@@ -28,6 +28,8 @@ const controllerCustom = {
   }),
   me: promiseHandler(async () => true),
 };
+
+router.use(billing);
 
 router.post('/', controllerCustom.authLogin);
 router.post('/reset-password', controllerCustom.resetPassword);

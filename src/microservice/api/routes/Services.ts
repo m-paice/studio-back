@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { accountContext } from '../../../middleware/accountContext';
 
 import servicesResource from '../../../resource/Services';
 import { promiseHandler } from '../../../utils/routing';
-
 import controllerDefaut from '../controller';
+import { accountContext } from '../../../middleware/accountContext';
+import { billing } from '../../../middleware/billing';
 
 const whiteList = [];
 
@@ -28,6 +28,7 @@ const handleFormatData = (req, res, next) => {
 };
 
 router.use(accountContext);
+router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

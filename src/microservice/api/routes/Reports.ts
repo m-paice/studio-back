@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import { accountContext } from '../../../middleware/accountContext';
 
 import reportsResource from '../../../resource/Reports';
 import { promiseHandler } from '../../../utils/routing';
-
 import controllerDefaut from '../controller';
 import Users from '../../../models/Users';
 import Schedules from '../../../models/Schedules';
 import Services from '../../../models/Services';
+import { accountContext } from '../../../middleware/accountContext';
+import { billing } from '../../../middleware/billing';
 
 const controller = controllerDefaut(reportsResource, [
   {
@@ -54,6 +54,7 @@ const controllerCustom = {
 const router = Router();
 
 router.use(accountContext);
+router.use(billing);
 
 router.get('/', controller.index);
 router.post('/', controllerCustom.reports);

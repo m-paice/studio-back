@@ -4,6 +4,7 @@ import Services from './Services';
 import Reports from './Reports';
 import Accounts from './Accounts';
 import Admin from './Admin';
+import Billings from './Billings';
 
 export default {
   Schedules,
@@ -12,4 +13,5 @@ export default {
   Reports,
   Accounts,
   Admin,
+  Billings,
 };
