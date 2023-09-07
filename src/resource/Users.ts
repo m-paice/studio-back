@@ -3,6 +3,7 @@ import UserRepository from '../repository/Users';
 import { UserInstance } from '../models/Users';
 import BaseResource from './BaseResource';
 import AuthResource from './Auth';
+import queuedAsyncMap from '../utils/queuedAsyncMap';
 
 export class UserResource extends BaseResource<UserInstance> {
   constructor() {
@@ -27,6 +28,23 @@ export class UserResource extends BaseResource<UserInstance> {
           await UserRepository.updateById(id, { password: hash });
         }
       },
+    });
+  }
+
+  async import({ payload, accountId }: { payload: { name: string; phone: string }[]; accountId: string }) {
+    await queuedAsyncMap(payload, async (user) => {
+      const cellPhone = (user.phone.match(/\d+/g) || []).join('');
+
+      const userExist = await UserRepository.findOne({ where: { accountId, name: user.name, cellPhone } });
+
+      if (!userExist) {
+        await UserRepository.create({
+          accountId,
+          name: user.name,
+          cellPhone,
+          type: 'pf',
+        });
+      }
     });
   }
 

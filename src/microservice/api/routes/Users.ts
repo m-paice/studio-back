@@ -21,6 +21,11 @@ const controllerCustom = {
 
     return response;
   }),
+  import: promiseHandler(async (req) => {
+    const response = await usersResource.import({ payload: req.body.users, accountId: req.body.accountId });
+
+    return response;
+  }),
 };
 
 const router = Router();
@@ -33,6 +38,7 @@ router.get('/:id', controller.show);
 router.get('/search/:name', controllerCustom.findByName);
 router.get('/employee/:name', controllerCustom.findEmployeeByName);
 router.post('/', controller.create);
+router.post('/import', controllerCustom.import);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 
