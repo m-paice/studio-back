@@ -12,19 +12,19 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
       entity: 'schedule',
       repository: ScheduleRepository,
       onCreated: async (props) => {
-        const body = props.body as { services: string[] };
+        const body = props.body as { services: { id: string; isPackage: boolean }[] };
         const newRecord = props.new as ScheduleInstance;
 
         if (body.services?.length) {
           await queuedAsyncMap(body.services, async (item) => {
-            const service = await ServiceResource.findById(item);
+            const service = await ServiceResource.findById(item.id);
 
-            await newRecord.addService(service);
+            await newRecord.addService(service, { through: { isPackage: item.isPackage } });
           });
         }
       },
       onUpdated: async (props) => {
-        const body = props.body as { services: string[] };
+        const body = props.body as { services: { id: string; isPackage: boolean }[] };
         const newRecord = props.new as ScheduleInstance;
 
         // apagar todos os serviços desse agendamento
@@ -32,13 +32,11 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
 
         // criar novos serviços
         if (body.services?.length) {
-          await Promise.all(
-            body.services.map(async (item) => {
-              const service = await ServiceResource.findById(item);
+          await queuedAsyncMap(body.services, async (item) => {
+            const service = await ServiceResource.findById(item.id);
 
-              await newRecord.addService(service);
-            }),
-          );
+            await newRecord.addService(service, { through: { isPackage: item.isPackage } });
+          });
         }
 
         const report = await ReportResource.findOne({
@@ -53,11 +51,10 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
 
           await ReportResource.createOrUpdate({
             scheduleId: props.id,
-            servicesId: schedule.services.map((item) => item.id),
-            addition: Number(newRecord.addition),
-            discount: Number(newRecord.discount),
             reportId: report.id,
             accountId: schedule.accountId,
+            addition: Number(newRecord.addition),
+            discount: Number(newRecord.discount),
           });
         }
       },
@@ -80,17 +77,12 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
   }) {
     const scheduleUpdated = await ScheduleRepository.updateById(id, { status });
 
-    const schduleServices = await ScheduleRepository.findById(id, {
-      include: ['services'],
-    });
-
-    if (status === 'finished' && !scheduleUpdated.isPackage) {
+    if (status === 'finished') {
       await ReportResource.createOrUpdate({
         scheduleId: scheduleUpdated.id,
-        servicesId: schduleServices.services.map((item) => item.id),
+        accountId,
         addition: scheduleUpdated.addition,
         discount: scheduleUpdated.discount,
-        accountId,
       });
     }
 

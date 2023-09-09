@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import sequelize from '../services/sequelize';
 import { ServiceInstance } from './Services';
 import { UserInstance } from './Users';
+import { ServiceScheduleInstance } from './ServiceSchedule';
 
 export type ScheduleInstance = {
   id: string;
@@ -19,6 +20,8 @@ export type ScheduleInstance = {
   isPackage: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+
+  ServiceSchedule: ServiceScheduleInstance;
 
   addService(data: ServiceInstance, options?): void;
   removeService(data: ServiceInstance, options?): void;

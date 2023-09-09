@@ -5,6 +5,7 @@ import sequelize from '../services/sequelize';
 export type ServiceScheduleInstance = {
   serviceId: string;
   scheduleId: string;
+  isPackage: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -14,6 +15,7 @@ const ServiceSchedule = sequelize.define(
   {
     serviceId: Sequelize.UUID,
     scheduleId: Sequelize.UUID,
+    isPackage: Sequelize.BOOLEAN,
     createdAt: {
       type: Sequelize.DATE,
       defaultValue: new Date(),

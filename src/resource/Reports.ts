@@ -4,8 +4,8 @@ import ReportRepository from '../repository/Reports';
 import { ReportInstance } from '../models/Reports';
 import BaseResource from './BaseResource';
 import ScheduleResource from './Schedules';
-import ServiceResource from './Services';
 import Schedules from '../models/Schedules';
+import { ServiceInstance } from '../models/Services';
 
 export class ReportResource extends BaseResource<ReportInstance> {
   constructor() {
@@ -85,22 +85,20 @@ export class ReportResource extends BaseResource<ReportInstance> {
 
   async createOrUpdate({
     reportId = null,
-    servicesId,
     scheduleId,
     discount,
     addition,
     accountId,
   }: {
-    reportId?: string | null;
-    servicesId: string[];
     scheduleId: string;
+    reportId?: string | null;
+    accountId: string;
     discount: number;
     addition: number;
-    accountId: string;
   }) {
-    const services = await ServiceResource.findMany({
-      where: { id: { $in: servicesId } },
-    });
+    const schedule = await ScheduleResource.findById(scheduleId, { include: ['services'] });
+
+    const services = (schedule.services as ServiceInstance[]).filter((item) => !item.ServiceSchedule.isPackage);
 
     let total = services.reduce((acc, cur) => acc + cur.price, 0);
 

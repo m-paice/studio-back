@@ -1,6 +1,8 @@
 import Sequelize from 'sequelize';
 
 import sequelize from '../services/sequelize';
+import { ServiceScheduleInstance } from './ServiceSchedule';
+import { ScheduleInstance } from './Schedules';
 
 export type ServiceInstance = {
   id: string;
@@ -11,6 +13,9 @@ export type ServiceInstance = {
   porcent: number;
   createdAt?: Date;
   updatedAt?: Date;
+
+  ServiceSchedule: ServiceScheduleInstance;
+  schedules: ScheduleInstance;
 };
 
 const Service = sequelize.define(
