@@ -16,7 +16,6 @@ module.exports = {
       },
       userId: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
           model: 'users',
           key: 'id',
@@ -35,7 +34,6 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: 'pending',
       },
-      isPackage: Sequelize.BOOLEAN,
       discount: {
         type: Sequelize.DOUBLE,
         defaultValue: 0,

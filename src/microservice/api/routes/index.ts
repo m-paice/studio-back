@@ -7,6 +7,7 @@ import schedulesRoutes from './Schedules';
 import servicesRoutes from './Services';
 import reportsRoutes from './Reports';
 import adminRoutes from './Admin';
+import publicRoutes from './Public';
 
 import * as loggers from '../../../utils/logger';
 import auth from '../../../middleware/auth';
@@ -23,5 +24,6 @@ routes.use('/schedules', auth, schedulesRoutes);
 routes.use('/reports', auth, reportsRoutes);
 routes.use('/accounts', onlyAdmin, accountsRoutes);
 routes.use('/admin', onlyAdmin, adminRoutes);
+routes.use('/public', publicRoutes);
 
 export default routes;
