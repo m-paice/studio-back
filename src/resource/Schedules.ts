@@ -27,16 +27,18 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
         const body = props.body as { services: { id: string; isPackage: boolean }[] };
         const newRecord = props.new as ScheduleInstance;
 
-        // apagar todos os serviços desse agendamento
-        await ServiceSchedule.destroy({ where: { scheduleId: props.id } });
+        if (body?.services && Array.isArray(body.services) && body.services.length) {
+          // apagar todos os serviços desse agendamento
+          await ServiceSchedule.destroy({ where: { scheduleId: props.id } });
 
-        // criar novos serviços
-        if (body.services?.length) {
-          await queuedAsyncMap(body.services, async (item) => {
-            const service = await ServiceResource.findById(item.id);
+          // criar novos serviços
+          if (body.services?.length) {
+            await queuedAsyncMap(body.services, async (item) => {
+              const service = await ServiceResource.findById(item.id);
 
-            await newRecord.addService(service, { through: { isPackage: item.isPackage } });
-          });
+              await newRecord.addService(service, { through: { isPackage: item.isPackage } });
+            });
+          }
         }
 
         const report = await ReportResource.findOne({
@@ -45,9 +47,7 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
 
         // verificar se existe relatorio desse agendamento
         if (report) {
-          const schedule = await ScheduleRepository.findById(props.id, {
-            include: ['services'],
-          });
+          const schedule = await ScheduleRepository.findById(props.id);
 
           await ReportResource.createOrUpdate({
             scheduleId: props.id,
