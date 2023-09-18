@@ -54,6 +54,19 @@ const controllerCustom = {
 
     return response;
   }),
+  updateAccount: promiseHandler(async (req) => {
+    const accountId = req.params.id;
+    const payload = req.body;
+
+    const account = await resource.Accounts.findById(accountId);
+
+    if (!account) throw new Error('account not found');
+
+    return resource.Accounts.updateById(accountId, {
+      name: payload.name,
+      config: payload.config,
+    });
+  }),
 };
 
 const router = Router();
@@ -64,5 +77,6 @@ router.get('/account/:id/info', controllerCustom.info);
 router.get('/account/:id/services', controllerCustom.services);
 router.get('/account/:id/schedules', controllerCustom.schedules);
 router.post('/account/:id/schedules', controllerCustom.createSchedule);
+router.put('/account/:id', controllerCustom.updateAccount);
 
 export default router;

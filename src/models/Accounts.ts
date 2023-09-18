@@ -9,6 +9,19 @@ export type AccountInstance = {
   trial: boolean;
   enable: boolean;
   dueDate: Date;
+  config: {
+    startAt: number;
+    endAt: number;
+    days: {
+      dom: boolean;
+      seg: boolean;
+      ter: boolean;
+      qua: boolean;
+      qui: boolean;
+      sex: boolean;
+      sab: boolean;
+    };
+  };
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -30,6 +43,7 @@ const Account = sequelize.define(
     trial: Sequelize.BOOLEAN,
     enable: Sequelize.BOOLEAN,
     dueDate: Sequelize.DATE,
+    config: Sequelize.JSONB,
     updatedAt: {
       type: Sequelize.DATE,
       allowNull: false,
