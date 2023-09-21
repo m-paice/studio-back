@@ -1,6 +1,7 @@
 import { ServerResponse } from 'http';
 import debug from 'debug';
 import { Request, Response, NextFunction } from 'express';
+import { sendMessageDiscord } from '../services/discord';
 
 type HandlerFunction = (req: Request, res: Response, next?: NextFunction) => Promise<any> | ServerResponse | any;
 
@@ -29,6 +30,7 @@ export const promiseHandler = (fn: HandlerFunction) => (req: Request, res: Respo
       })
       .catch((error) => {
         logger('error on promise handler', { error });
+        sendMessageDiscord({ message: error.toString() });
 
         next(error);
       });

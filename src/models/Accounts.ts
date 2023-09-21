@@ -22,6 +22,7 @@ export type AccountInstance = {
       sab: boolean;
     };
   };
+  token: string[];
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -44,6 +45,7 @@ const Account = sequelize.define(
     enable: Sequelize.BOOLEAN,
     dueDate: Sequelize.DATE,
     config: Sequelize.JSONB,
+    token: Sequelize.JSONB,
     updatedAt: {
       type: Sequelize.DATE,
       allowNull: false,

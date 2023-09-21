@@ -2,6 +2,8 @@ import debug from 'debug';
 import { Request, Response } from 'express';
 import { Includeable } from 'sequelize';
 
+import { sendMessageDiscord } from '../../services/discord';
+
 const logger = debug('@controller');
 
 export default <T>(resource: any, whiteList?: string[] | Includeable | Includeable[]) => {
@@ -17,8 +19,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
         .then((data: Partial<T>) => data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on find many controller', { error });
+      sendMessageDiscord({ message: error.toString() });
 
       return res.status(500).json(error);
     }
@@ -37,8 +40,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
         .then((data: Partial<T>) => data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on index controller', { error });
+      sendMessageDiscord({ message: error.toString() });
       return res.status(500).json(error);
     }
   };
@@ -56,8 +60,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
         .then((data: Partial<T>) => data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on show controller', { error });
+      sendMessageDiscord({ message: error.toString() });
       return res.status(500).json(error);
     }
   };
@@ -69,8 +74,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
       const response = await resource.create(body, query).then((data: Partial<T>) => data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on create controller', { error });
+      sendMessageDiscord({ message: error.toString() });
 
       return res.status(500).json(error);
     }
@@ -84,8 +90,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
       const response = await resource.updateById(id, body, query).then((data: Partial<T>) => data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on update controller', { error });
+      sendMessageDiscord({ message: error.toString() });
       return res.status(500).json(error);
     }
   };
@@ -97,8 +104,9 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
       const response = await resource.destroyById(id).then((data: Partial<T>) => !!data);
 
       return res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       logger('erro on destroy controller', { error });
+      sendMessageDiscord({ message: error.toString() });
       return res.status(500).json(error);
     }
   };
