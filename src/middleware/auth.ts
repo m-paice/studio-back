@@ -18,7 +18,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 
   // check account valid
   AccountsResource.findById(decoded.accountId).then((response) => {
-    if (!response.enable) return res.status(401).json({ message: 'account blocked' });
+    if (!response?.enable) return res.status(401).json({ message: 'account blocked' });
 
     req.userId = decoded.userId;
     req.accountId = decoded.accountId;
