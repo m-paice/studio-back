@@ -1,6 +1,7 @@
 import { Sequelize, Op } from 'sequelize';
 
 import { NODE_ENV } from '../constants';
+import { POSTGRES_MAX_CONNECTIONS, POSTGRES_MAX_RETRIES, POSTGRES_MIN_CONNECTIONS } from '../constants/postgres';
 
 const configDb = require('../config/database');
 
@@ -44,9 +45,18 @@ const operatorsAliases = {
 };
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
-  dialect: config.dialect,
   host: config.host,
   port: config.port,
+  dialect: config.dialect,
+  pool: {
+    max: POSTGRES_MAX_CONNECTIONS,
+    min: POSTGRES_MIN_CONNECTIONS,
+    acquire: 30000,
+    idle: 10000,
+  },
+  retry: {
+    max: POSTGRES_MAX_RETRIES,
+  },
   logging: false,
   operatorsAliases,
 });

@@ -18,7 +18,9 @@ export const initAssociations = () => {
 
 export const start = () => {
   sequelize
-    .authenticate()
+    .sync({
+      hooks: true,
+    })
     .then(() => {
       initAssociations();
       logger('db is ready');
@@ -27,6 +29,7 @@ export const start = () => {
       logger('db is error', {
         message: error,
       });
+      process.exit(-1);
     });
 };
 
