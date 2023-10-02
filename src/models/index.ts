@@ -5,6 +5,7 @@ import Reports from './Reports';
 import Billing from './Billings';
 import Accounts from './Accounts';
 import ServiceSchedule from './ServiceSchedule';
+import Templates from './Templates';
 
 export default {
   Services,
@@ -14,4 +15,5 @@ export default {
   Billing,
   Accounts,
   ServiceSchedule,
+  Templates,
 };
