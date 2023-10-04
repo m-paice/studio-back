@@ -11,6 +11,7 @@ export type UserInstance = {
   password: string;
   isSuperAdmin: boolean;
   birthDate: string;
+  theme: string;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
@@ -30,6 +31,7 @@ const User = sequelize.define(
     password: Sequelize.STRING,
     isSuperAdmin: Sequelize.BOOLEAN,
     birthDate: Sequelize.STRING,
+    theme: Sequelize.STRING,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,
