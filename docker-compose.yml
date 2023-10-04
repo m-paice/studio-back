@@ -14,18 +14,27 @@ services:
     ports:
       - 5435:5432
 
-  # back:
-  #   container_name: studio-back
-  #   image: paice0510/api-studio
-  #   restart: always
-  #   env_file:
-  #     - envfile.env
-  #   ports:
-  #     - 3333:3333
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
 
-  # front:
-  #   container_name: studio-front
-  #   image: paice0510/front-studio
-  #   restart: always
-  #   ports:
-  #     - 3000:80
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+
+  node_exporter:
+    image: prom/node-exporter
+    ports:
+      - '9100:9100'
