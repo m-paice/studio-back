@@ -1,22 +1,27 @@
 module.exports = {
   env: {
-    es6: true,
+    es2021: true,
     node: true,
+    jest: true,
   },
-  extends: 'airbnb-base',
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
-  },
+  extends: ['airbnb-base', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'import'],
   rules: {
-    'import/prefer-default-export': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
+    'no-underscore-dangle': 'off',
+    'no-unused-vars': 'off',
+    'no-shadow': 'off',
     'class-methods-use-this': 'off',
+    'no-console': 'warn',
+    'no-undef': 'warn',
+    '@typescript-eslint/no-shadow': ['error'],
+    'import/prefer-default-export': 0,
+    'import/no-cycle': 0,
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -27,14 +32,19 @@ module.exports = {
         tsx: 'never',
       },
     ],
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'max-len': ['error', { code: 120 }],
   },
   settings: {
     'import/resolver': {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
+      alias: {
+        map: [['@src', './src']],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+    react: {
+      version: 'latest',
     },
   },
 };
