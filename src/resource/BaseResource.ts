@@ -21,7 +21,7 @@ interface CallbackOnCreateParams<T> {
   body: unknown;
 }
 
-interface CallbackOnDeletedParams<T> {
+interface CallbackOnDeletedParams {
   id: string;
 }
 
@@ -41,11 +41,11 @@ type PaginatedOptions<T> = IOptions<T> & {
   perPage?: number | string;
 };
 
-interface BaseControllerOptions<T> {
-  repository: BaseSequelizeRepository<T>;
+interface BaseControllerOptions<K> {
+  repository: BaseSequelizeRepository<K>;
   entity: string;
   onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
-  onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
+  onDeleted?: (options: CallbackOnDeletedParams) => Promise<void>;
   onUpdated?: <T>(options: CallbackOnUpdateParams<T>) => Promise<void>;
 }
 
@@ -58,7 +58,7 @@ export default class BaseResource<TModel extends Instance> {
 
   onCreated?: <T>(options: CallbackOnCreateParams<T>) => Promise<void>;
 
-  onDeleted?: <T>(options: CallbackOnDeletedParams<T>) => Promise<void>;
+  onDeleted?: (options: CallbackOnDeletedParams) => Promise<void>;
 
   onUpdated?: <T>(options: CallbackOnUpdateParams<T>) => Promise<void>;
 
@@ -216,22 +216,24 @@ export default class BaseResource<TModel extends Instance> {
   ) {
     return this.getRepository()
       .findById(id, options)
-      .then((model) => this.update(model, data, options).then((response) => {
-        if (this.onUpdated) {
-          this.onUpdated({
-            id,
-            new: response,
-            old: model,
-            body: data,
-          }).catch((errorCallback) => {
-            logger('error on callback update: ', {
-              error: errorCallback,
+      .then((model) =>
+        this.update(model, data, options).then((response) => {
+          if (this.onUpdated) {
+            this.onUpdated({
+              id,
+              new: response,
+              old: model,
+              body: data,
+            }).catch((errorCallback) => {
+              logger('error on callback update: ', {
+                error: errorCallback,
+              });
             });
-          });
-        }
+          }
 
-        return response;
-      }));
+          return response;
+        }),
+      );
   }
 
   destroy(model: TModel, options: Options = {}): Promise<void> {

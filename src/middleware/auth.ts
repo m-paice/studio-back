@@ -4,20 +4,22 @@ import jwt from 'jsonwebtoken';
 import { VERIFY_TOKEN } from '../constants';
 import AccountsResource from '../resource/Accounts';
 
-const auth = (req: Request, res: Response, next: NextFunction) => {
+const auth = async (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   const token = authorization ? authorization.split(' ')[1] : null;
 
   if (!token) return res.sendStatus(401);
 
-  const decoded: any = jwt.verify(token, VERIFY_TOKEN);
+  try {
+    const decoded: any = jwt.verify(token, VERIFY_TOKEN);
 
-  if (!decoded) return res.sendStatus(401);
+    if (!decoded) return res.sendStatus(401);
 
-  if (!decoded.accountId && decoded.isSuperAdmin) return next();
+    if (!decoded.accountId && decoded.isSuperAdmin) return next();
 
-  // check account valid
-  AccountsResource.findById(decoded.accountId).then((response) => {
+    // check account valid
+    const response = await AccountsResource.findById(decoded.accountId);
+
     if (!response?.enable) return res.status(401).json({ message: 'account blocked' });
 
     req.userId = decoded.userId;
@@ -25,7 +27,10 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
     req.isSuperAdmin = decoded.isSuperAdmin;
 
     return next();
-  });
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500); // or handle the error in an appropriate way
+  }
 };
 
 export const generateToken = ({

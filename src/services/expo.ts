@@ -16,10 +16,8 @@ export async function sendNotification({ token, title, message }) {
   };
 
   try {
-    const receipts = await expo.sendPushNotificationsAsync([payload]);
-
-    console.log({ receipts });
+    await expo.sendPushNotificationsAsync([payload]);
   } catch (error) {
-    console.log({ error });
+    console.error({ error });
   }
 }
