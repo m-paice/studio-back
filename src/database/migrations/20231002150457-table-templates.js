@@ -29,5 +29,5 @@ module.exports = {
       },
     }),
 
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('templates'),
+  down: (queryInterface) => queryInterface.dropTable('templates'),
 };

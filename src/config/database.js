@@ -17,7 +17,7 @@ module.exports = {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     dialect: process.env.DB_DIALECT,
-    logging: (log) => false && console.log(log),
+    logging: (log) => false && console.warn(log),
   },
   production: {
     username: process.env.DB_USERNAME,
@@ -26,7 +26,7 @@ module.exports = {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     dialect: process.env.DB_DIALECT,
-    logging: (log) => false && console.log(log),
+    logging: (log) => false && console.warn(log),
   },
   connection: {
     database: process.env.DB_DATABASE,
@@ -35,6 +35,6 @@ module.exports = {
     dialect: process.env.DB_DIALECT,
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
-    logging: (log) => false && console.log(log),
+    logging: (log) => false && console.warn(log),
   },
 };
