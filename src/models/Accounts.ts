@@ -21,7 +21,7 @@ export type AccountInstance = {
       sex: boolean;
       sab: boolean;
     };
-  };
+  }; // force commit
   token: string[];
   createdAt?: Date;
   updatedAt?: Date;

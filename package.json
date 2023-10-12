@@ -1,12 +1,14 @@
 {
   "name": "studio-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "build": "rm -rf dist && babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
     "dev": "DEBUG=@* ts-node-dev --respawn --transpile-only src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "prepare": "husky install",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src/"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -53,14 +55,17 @@
     "@types/node": "^14.14.10",
     "@types/qs": "^6.9.5",
     "@types/sequelize": "^4.28.9",
-    "@typescript-eslint/eslint-plugin": "^2.19.2",
-    "@typescript-eslint/parser": "^2.19.2",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
     "babel-plugin-syntax-flow": "^6.18.0",
     "commitizen": "^4.2.2",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint": "^8.46.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-import": "^2.20.1",
+    "husky": "^8.0.0",
     "nodemon": "^2.0.2",
+    "prettier": "^3.0.3",
     "sequelize-cli": "^6.6.1",
     "ts-node-dev": "^1.0.0",
     "typescript": "^3.7.5"
