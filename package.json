@@ -1,12 +1,12 @@
 {
   "name": "studio-api",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "build": "rm -rf dist && babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
     "dev": "DEBUG=@* ts-node-dev --respawn --transpile-only src/server.ts",
-    "start": "node dist/server.js",
+    "start": "DEBUG=@* node dist/server.js",
     "prepare": "husky install",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src/"
   },
