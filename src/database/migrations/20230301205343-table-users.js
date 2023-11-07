@@ -20,6 +20,9 @@ module.exports = {
       password: Sequelize.STRING,
       isSuperAdmin: Sequelize.BOOLEAN,
       birthDate: Sequelize.STRING,
+      theme: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

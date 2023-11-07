@@ -29,6 +29,9 @@ module.exports = {
           key: 'id',
         },
       },
+      shortName: {
+        type: Sequelize.STRING,
+      },
       scheduleAt: Sequelize.DATE,
       status: {
         type: Sequelize.STRING,

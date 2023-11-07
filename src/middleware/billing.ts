@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import resource from '../resource';
 
 export const billing = async (req: Request, res: Response, next: NextFunction) => {
-  const { method, ip, originalUrl, headers, userId, accountId } = req;
+  const { method, ip, originalUrl, headers, userId, accountId = null } = req;
 
   const userAgent = headers['user-agent'];
 

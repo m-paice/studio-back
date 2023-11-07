@@ -19,6 +19,10 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
+      isPackage: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         type: Sequelize.DATE,
       },

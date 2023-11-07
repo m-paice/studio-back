@@ -16,6 +16,25 @@ module.exports = {
       trial: Sequelize.BOOLEAN,
       enable: Sequelize.BOOLEAN,
       dueDate: Sequelize.DATE,
+      token: {
+        type: Sequelize.STRING,
+      },
+      config: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          startAt: 7,
+          endAt: 20,
+          days: {
+            dom: true,
+            seg: true,
+            ter: true,
+            qua: true,
+            qui: true,
+            sex: true,
+            sab: true,
+          },
+        },
+      },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,

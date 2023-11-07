@@ -14,6 +14,9 @@ module.exports = {
           key: 'id',
         },
       },
+      averageTime: {
+        type: Sequelize.STRING,
+      },
       name: Sequelize.STRING,
       price: Sequelize.DOUBLE,
       type: Sequelize.STRING,

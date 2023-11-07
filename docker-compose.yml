@@ -14,27 +14,27 @@ services:
     ports:
       - 5435:5432
 
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - 9090:9090
+  # prometheus:
+  #   container_name: prometheus
+  #   image: prom/prometheus
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #   ports:
+  #     - 9090:9090
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    ports:
-      - 3000:3000
-    depends_on:
-      - prometheus
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - prometheus
 
-  node_exporter:
-    image: prom/node-exporter
-    ports:
-      - '9100:9100'
+  # node_exporter:
+  #   image: prom/node-exporter
+  #   ports:
+  #     - '9100:9100'
