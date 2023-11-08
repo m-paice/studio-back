@@ -17,6 +17,7 @@ export type ScheduleInstance = {
   shortName: string;
   status: 'pending' | 'finished' | 'canceled';
   discount: number;
+  averageTime: number;
   addition: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -41,6 +42,7 @@ const Schedule = sequelize.define(
       type: Sequelize.STRING,
       defaultValue: 'pending',
     },
+    averageTime: Sequelize.INTEGER,
     discount: Sequelize.DOUBLE,
     addition: Sequelize.DOUBLE,
     createdAt: {
