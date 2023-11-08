@@ -29,7 +29,6 @@ export const start = () => {
       logger('db is error', {
         message: error,
       });
-      process.exit(-1);
     });
 };
 
