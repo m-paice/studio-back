@@ -4,7 +4,7 @@ import ReportRepository from '../repository/Reports';
 import { ReportInstance } from '../models/Reports';
 import BaseResource from './BaseResource';
 import ScheduleResource from './Schedules';
-import Schedules from '../models/Schedules';
+import Models from '../models';
 import { ServiceInstance } from '../models/Services';
 
 export class ReportResource extends BaseResource<ReportInstance> {
@@ -17,69 +17,32 @@ export class ReportResource extends BaseResource<ReportInstance> {
 
   async reports({ startAt, endAt }: { startAt: Date; endAt: Date }, query) {
     const defaultWhere = {
-      scheduleAt: {
+      createdAt: {
         [Op.between]: [startAt, endAt],
       },
     };
 
     const reports = await ReportRepository.findMany({
       ...query,
+      where: {
+        ...query.where,
+        ...defaultWhere,
+      },
       include: [
         {
-          model: Schedules,
+          model: Models.Schedules,
           as: 'schedule',
-          where: {
-            ...defaultWhere,
-            ...query.where,
-            status: 'finished',
-          },
+          include: [
+            { model: Models.Users, as: 'user', attributes: ['name'] },
+            { model: Models.Users, as: 'employee', attributes: ['name'] },
+            { model: Models.Services, as: 'services', attributes: ['name'] },
+          ],
         },
       ],
     });
 
-    const response = reports.reduce(
-      (acc, cur) => ({
-        entry: acc.entry + cur.entry,
-        out: acc.out + cur.out,
-      }),
-      {
-        entry: 0,
-        out: 0,
-      },
-    );
-
-    const countFinished = await ScheduleResource.count({
-      where: {
-        ...defaultWhere,
-        ...query.where,
-        status: 'finished',
-      },
-    });
-
-    const countCanceled = await ScheduleResource.count({
-      where: {
-        ...defaultWhere,
-        ...query.where,
-        status: 'canceled',
-      },
-    });
-
-    const registerOut = await ReportRepository.findMany({
-      where: {
-        createdAt: {
-          [Op.between]: [startAt, endAt],
-        },
-        ...query.where,
-      },
-    });
-
-    const valueRegisterOut = registerOut.reduce((acc, cur) => acc + cur.out, 0);
-
     return {
-      entry: response.entry,
-      out: response.out + valueRegisterOut,
-      countFinished,
-      countCanceled,
+      data: reports,
     };
   }
 
