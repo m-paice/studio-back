@@ -11,8 +11,10 @@ import routes from './routes';
 
 // services
 import setupSequelize from './services/setupSequelize';
+import { RabbitmqServer } from './services/amqp';
 // microservices
 import routesApi from './microservice/api/routes';
+import { sender } from './microservice/sender';
 // middleware
 import { limiter } from './middleware/rateLimit';
 
@@ -29,9 +31,12 @@ class Server {
 
   private logger: debug.Debugger;
 
+  serverRabbitmq: RabbitmqServer;
+
   constructor() {
     this.express = express();
     this.logger = debug('@server');
+    this.serverRabbitmq = new RabbitmqServer();
     dotenv.config();
   }
 
@@ -40,6 +45,7 @@ class Server {
     this.routes();
     this.metrics();
     await this.database();
+    await this.microservices();
 
     this.express.listen(this.PORT, () => {
       this.logger(`server listening on port ${this.PORT}`);
@@ -76,11 +82,28 @@ class Server {
     this.express.use('/api/v1', routesApi);
   }
 
+  async microservices() {
+    await this.serverRabbitmq.start();
+    await this.serverRabbitmq.setup();
+    await this.serverRabbitmq.consumer({
+      queue: 'send',
+      callback: async (message) => sender(JSON.parse(message)),
+    });
+  }
+
   metrics() {
     this.express.get('/metrics', async (req, res) => {
       res.set('Content-Type', client.register.contentType);
       return res.send(await client.register.metrics());
     });
+
+    // this.express.get('/send', async (req, res) => {
+    //   await this.serverRabbitmq.publishQueue({
+    //     message: { data: 'Novo cliente' },
+    //   });
+
+    //   return res.sendStatus(200);
+    // });
   }
 }
 

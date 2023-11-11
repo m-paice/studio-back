@@ -3,30 +3,62 @@ version: '3'
 services:
   db:
     container_name: postgresql-studio
-    image: postgres:11.2-alpine
-    command: postgres -c 'max_connections=500'
+    image: postgres:15.2-bullseye
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: studio
+      POSTGRES_HOST: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: 'studio'
+      POSTGRES_PASSWORD: '0222d8c53d3dd637'
+      PGPASSWORD: '0222d8c53d3dd637'
     restart: always
-    shm_size: '256mb'
+    volumes:
+      - db:/var/lib/postgresql/data
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    restart: unless-stopped
     ports:
-      - 5435:5432
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+
+  worker-whatsapp:
+    container_name: api
+    image: paice0510/worker-whatsapp
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    env_file:
+      - ./env_file_worker.env
+    ports:
+      - 3331:3331
+    volumes:
+      - ./:/home/node/app
+      - /home/node/app/node_modules/
 
   back:
-    container_name: studio-back
     image: paice0510/api-studio
     env_file:
       - ./env_file.env
-    restart: always
     depends_on:
       - db
     ports:
-      - 3333:3333
+      - '3333:3333'
+      - '3334:3333'
 
   front:
     container_name: front-agendar
     image: paice0510/front-agendar
     ports:
       - 3000:80
+
+  site:
+    container_name: front-site
+    image: paice0510/front-studio
+    ports:
+      - 3001:80
+
+volumes:
+  db:
+  mongodb:
