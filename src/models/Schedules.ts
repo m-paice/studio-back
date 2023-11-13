@@ -83,6 +83,12 @@ Schedule.associate = (models) => {
     foreignKey: 'employeeId',
     as: 'employee',
   });
+
+  Schedule.belongsToMany(models.Campaigns, {
+    foreignKey: 'scheduleId',
+    through: models.CampaignSchedule,
+    as: 'campaign',
+  });
 };
 
 export default Schedule;

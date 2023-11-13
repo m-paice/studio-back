@@ -55,6 +55,11 @@ User.associate = (models) => {
     foreignKey: 'accountId',
     as: 'account',
   });
+  User.belongsToMany(models.Campaigns, {
+    foreignKey: 'userId',
+    through: models.CampaignUser,
+    as: 'campaign',
+  });
 };
 
 export default User;

@@ -6,12 +6,11 @@ import cors from 'cors';
 import responseTime from 'response-time';
 import client from 'prom-client';
 import debug from 'debug';
-
 import routes from './routes';
 
 // services
 import setupSequelize from './services/setupSequelize';
-import { RabbitmqServer } from './services/amqp';
+import { AmqpServer, amqpClient } from './services/amqp';
 // microservices
 import routesApi from './microservice/api/routes';
 import { sender } from './microservice/sender';
@@ -31,12 +30,12 @@ class Server {
 
   private logger: debug.Debugger;
 
-  serverRabbitmq: RabbitmqServer;
+  amqpClient: AmqpServer;
 
   constructor() {
     this.express = express();
     this.logger = debug('@server');
-    this.serverRabbitmq = new RabbitmqServer();
+    this.amqpClient = amqpClient;
     dotenv.config();
   }
 
@@ -83,9 +82,9 @@ class Server {
   }
 
   async microservices() {
-    await this.serverRabbitmq.start();
-    await this.serverRabbitmq.setup();
-    await this.serverRabbitmq.consumer({
+    await this.amqpClient.start();
+    await this.amqpClient.setup();
+    await this.amqpClient.consumer({
       queue: 'send',
       callback: async (message) => sender(JSON.parse(message)),
     });
@@ -96,14 +95,6 @@ class Server {
       res.set('Content-Type', client.register.contentType);
       return res.send(await client.register.metrics());
     });
-
-    // this.express.get('/send', async (req, res) => {
-    //   await this.serverRabbitmq.publishQueue({
-    //     message: { data: 'Novo cliente' },
-    //   });
-
-    //   return res.sendStatus(200);
-    // });
   }
 }
 

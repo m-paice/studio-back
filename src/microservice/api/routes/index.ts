@@ -9,6 +9,7 @@ import reportsRoutes from './Reports';
 import adminRoutes from './Admin';
 import publicRoutes from './Public';
 import templateRoutes from './Templates';
+import campaignsRoutes from './Campaigns';
 
 import * as loggers from '../../../utils/logger';
 import auth from '../../../middleware/auth';
@@ -24,6 +25,7 @@ routes.use('/services', auth, servicesRoutes);
 routes.use('/schedules', auth, schedulesRoutes);
 routes.use('/reports', auth, reportsRoutes);
 routes.use('/templates', auth, templateRoutes);
+routes.use('/campaigns', auth, campaignsRoutes);
 routes.use('/accounts', onlyAdmin, accountsRoutes);
 routes.use('/admin', onlyAdmin, adminRoutes);
 routes.use('/public', publicRoutes);

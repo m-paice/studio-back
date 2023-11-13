@@ -6,6 +6,9 @@ import Billing from './Billings';
 import Accounts from './Accounts';
 import ServiceSchedule from './ServiceSchedule';
 import Templates from './Templates';
+import Campaigns from './Campaigns';
+import CampaignUser from './CampaignUser';
+import CampaignSchedule from './CampaignSchedule';
 
 export default {
   Services,
@@ -16,4 +19,7 @@ export default {
   Accounts,
   ServiceSchedule,
   Templates,
+  Campaigns,
+  CampaignUser,
+  CampaignSchedule,
 };

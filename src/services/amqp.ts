@@ -21,7 +21,7 @@ interface ConsumerOptions {
   callback(message: string): void;
 }
 
-export class RabbitmqServer {
+export class AmqpServer {
   private conn: Connection;
 
   private channel: Channel;
@@ -75,3 +75,5 @@ export class RabbitmqServer {
     });
   }
 }
+
+export const amqpClient = new AmqpServer();

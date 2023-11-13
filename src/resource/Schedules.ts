@@ -22,8 +22,6 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
             await newRecord.addService(service, { through: { isPackage: item.isPackage } });
           });
         }
-
-        // disparar notificação aqui !!
       },
       onUpdated: async (props) => {
         const body = props.body as { services: { id: string; isPackage: boolean }[] };
