@@ -14,6 +14,7 @@ services:
     restart: always
     volumes:
       - db:/var/lib/postgresql/data
+
   mongodb:
     container_name: mongodb
     image: mongo:latest
@@ -22,6 +23,15 @@ services:
       - 27017:27017
     volumes:
       - mongodb:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'password'
+    ports:
+      - 15671:15672
+      - 5671:5672
 
   worker-whatsapp:
     container_name: api

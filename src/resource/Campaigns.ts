@@ -1,14 +1,19 @@
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
 import { CampaignInstance } from '../models/Campaigns';
 import CampaignsRepository from '../repository/Campaigns';
 import BaseResource from './BaseResource';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
 import UserResource from './Users';
 import ScheduleResource from './Schedules';
+import TemplatesResource from './Templates';
 import { amqpClient } from '../services/amqp';
 import { HttpError } from '../utils/error/HttpError';
 import Schedule from '../models/Schedules';
 import User from '../models/Users';
 import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
+import { handleReplaceAll } from './helpers/replaceAll';
 
 interface Content {
   userId?: string;
@@ -70,30 +75,48 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
 
     const payload: Content[] = [];
 
+    let { content } = campaign;
+
+    const template = campaign.templateId ? await TemplatesResource.findById(campaign.templateId) : null;
+
     if (campaign.users.length) {
       campaign.users.forEach((item) => {
-        const content = {
+        const sendPayload = {
           userId: item.id,
           campaignId,
-          content: campaign.content,
+          content,
           phoneNumber: item.cellPhone,
         };
 
-        payload.push(content);
+        payload.push(sendPayload);
       });
     }
 
     if (campaign.schedules.length) {
       campaign.schedules.forEach((item) => {
-        const content = {
+        if (template) {
+          const selectDay = format(item.scheduleAt, 'dd/MM', { locale: ptBR });
+          const dayOfWeek = format(item.scheduleAt, 'cccc', { locale: ptBR });
+          const selectHour = format(item.scheduleAt, 'HH:mm', { locale: ptBR });
+
+          content = handleReplaceAll({
+            mensagem: template.content,
+            contato: item.user.name,
+            dia: selectDay,
+            diaDaSemana: dayOfWeek,
+            horario: selectHour,
+          });
+        }
+
+        const sendPayload = {
           userId: item.user.id,
           scheduleId: item.id,
           campaignId,
-          content: campaign.content,
+          content,
           phoneNumber: item.user.cellPhone,
         };
 
-        payload.push(content);
+        payload.push(sendPayload);
       });
     }
 
