@@ -5,6 +5,7 @@ import queuedAsyncMap from '../utils/queuedAsyncMap';
 import UserResource from './Users';
 import ScheduleResource from './Schedules';
 import { amqpClient } from '../services/amqp';
+import { HttpError } from '../utils/error/HttpError';
 
 export class CampaignsResource extends BaseResource<CampaignInstance> {
   constructor() {
@@ -37,7 +38,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
   async start({ campaignId }: { campaignId: string }) {
     const campaign = await CampaignsRepository.findById(campaignId, { include: ['users', 'template'] });
 
-    if (!campaign) throw new Error('campaign not found!');
+    if (!campaign) throw new HttpError(500, 'campaign not found!');
 
     const payload = campaign.users.map((item) => ({
       content: campaign.content,

@@ -1,7 +1,7 @@
 import http from 'http';
 import ExtendableError from './ExtendableError';
 
-class HttpError extends ExtendableError {
+export class HttpError extends ExtendableError {
   constructor(status = 500, message = http.STATUS_CODES[status]) {
     super();
     this.name = 'HttpError';
@@ -9,5 +9,3 @@ class HttpError extends ExtendableError {
     this.message = message;
   }
 }
-
-export default HttpError;

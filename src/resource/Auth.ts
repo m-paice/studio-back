@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../middleware/auth';
 import usersResource from './Users';
+import { HttpError } from '../utils/error/HttpError';
 
 export class AuthResource {
   async generateHash(password: string): Promise<string> {
@@ -19,11 +20,11 @@ export class AuthResource {
       include: 'account',
     });
 
-    if (!user) throw new Error('invalid credentials');
+    if (!user) throw new HttpError(401, 'invalid credentials');
 
     const checkPassword = await this.compareHash(password, user.password);
 
-    if (!checkPassword) throw new Error('invalid credentials');
+    if (!checkPassword) throw new HttpError(401, 'invalid credentials');
 
     const token = generateToken({
       userId: user.id,
@@ -53,7 +54,7 @@ export class AuthResource {
       },
     });
 
-    if (!hasUser) throw new Error('user not found');
+    if (!hasUser) throw new HttpError(500, 'user not found');
 
     await usersResource.updateById(hasUser.id, {
       password: newPassword,

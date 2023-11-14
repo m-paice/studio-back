@@ -2,6 +2,7 @@ import { ServerResponse } from 'http';
 import debug from 'debug';
 import { Request, Response, NextFunction } from 'express';
 import { sendMessageDiscord } from '../services/discord';
+import { NODE_ENV } from '../constants';
 
 type HandlerFunction = (req: Request, res: Response, next?: NextFunction) => Promise<any> | ServerResponse | any;
 
@@ -29,10 +30,10 @@ export const promiseHandler = (fn: HandlerFunction) => (req: Request, res: Respo
         res.json(result);
       })
       .catch((error) => {
-        logger('error on promise handler', { error });
-        sendMessageDiscord({ message: error.toString() });
+        if (NODE_ENV === 'development') logger('error on promise handler', { error });
+        if (NODE_ENV !== 'development') sendMessageDiscord({ message: error.toString() });
 
-        next(error);
+        res.status(error?.status || 500).send({ message: error.message });
       });
 
     return;
