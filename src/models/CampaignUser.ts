@@ -5,6 +5,7 @@ import sequelize from '../services/sequelize';
 export type CampaignUserInstance = {
   campaignId: string;
   userId: string;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -14,6 +15,7 @@ const CampaignUser = sequelize.define(
   {
     campaignId: Sequelize.UUID,
     userId: Sequelize.UUID,
+    status: Sequelize.STRING,
     createdAt: {
       type: Sequelize.DATE,
       defaultValue: new Date(),

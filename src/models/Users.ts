@@ -27,7 +27,10 @@ const User = sequelize.define(
     },
     name: Sequelize.STRING,
     type: Sequelize.STRING,
-    cellPhone: Sequelize.STRING,
+    cellPhone: {
+      type: Sequelize.STRING,
+      unique: true,
+    },
     password: Sequelize.STRING,
     isSuperAdmin: Sequelize.BOOLEAN,
     birthDate: Sequelize.STRING,

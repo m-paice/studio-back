@@ -5,6 +5,7 @@ import sequelize from '../services/sequelize';
 export type CampaignScheduleInstance = {
   campaignId: string;
   scheduleId: string;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -14,6 +15,7 @@ const CampaignSchedule = sequelize.define(
   {
     campaignId: Sequelize.UUID,
     scheduleId: Sequelize.UUID,
+    status: Sequelize.STRING,
     createdAt: {
       type: Sequelize.DATE,
       defaultValue: new Date(),

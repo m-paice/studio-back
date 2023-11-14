@@ -19,6 +19,7 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
+      status: Sequelize.STRING,
       createdAt: {
         type: Sequelize.DATE,
       },

@@ -9,12 +9,13 @@ export type CampaignInstance = {
   accountId: string;
   templateId: string;
   name: string;
-  status: string;
+  status: 'pending' | 'processing' | 'done';
   content: string;
   createdAt?: Date;
   updatedAt?: Date;
 
   users: UserInstance[];
+  schedules: ScheduleInstance[];
 
   addUser(data: UserInstance, options?): void;
   removeUser(data: UserInstance, options?): void;
