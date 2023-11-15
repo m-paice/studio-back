@@ -3,8 +3,6 @@ dist/
 build/
 dist/
 
-deploy.sh
-
 .env
 src/tdlib
 
