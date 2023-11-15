@@ -1,6 +1,6 @@
 {
   "name": "studio-api",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -8,7 +8,13 @@
     "dev": "DEBUG=@* ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "DEBUG=@* node dist/server.js",
     "prepare": "husky install",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src/"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src/",
+    "deploy": "./deploy.sh"
+  },
+  "husky": {
+    "hooks": {
+      "post-push": "npm run deploy"
+    }
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
