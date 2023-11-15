@@ -174,12 +174,12 @@ export default class BaseResource<TModel extends Instance> {
     return this.getRepository().count(query);
   }
 
-  create(data: Partial<TModel>, options?: CreateOptions): Promise<TModel | void> {
+  create(data: Partial<TModel>, options?: CreateOptions): Promise<TModel> {
     return this.getRepository()
       .create(data, options)
-      .then((response) => {
+      .then(async (response) => {
         if (this.onCreated) {
-          this.onCreated({ id: response.id, new: response, body: data }).catch((errorCallback) => {
+          await this.onCreated({ id: response.id, new: response, body: data }).catch((errorCallback) => {
             logger('error on callback create: ', {
               error: errorCallback,
             });
@@ -187,11 +187,6 @@ export default class BaseResource<TModel extends Instance> {
         }
 
         return response;
-      })
-      .catch((error) => {
-        logger('error on create: ', {
-          error,
-        });
       });
   }
 

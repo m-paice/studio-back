@@ -74,6 +74,21 @@ const controllerCustom = {
 
     return response;
   }),
+  createAccountAndUser: promiseHandler(async (req) => {
+    const { name, cellPhone, password } = req.body;
+
+    const account = await resource.Accounts.createTrial({ name });
+    const user = await resource.Users.create({
+      name,
+      cellPhone,
+      password,
+      type: 'pj',
+      isSuperAdmin: true,
+      accountId: account.id,
+    });
+    const authenticate = await resource.Auth.authLogin({ username: user.cellPhone, password });
+    return authenticate;
+  }),
   updateAccountConfig: promiseHandler(async (req) => {
     const accountId = req.params.id;
     const payload = req.body;
@@ -121,6 +136,7 @@ router.get('/account/:id/info', controllerCustom.info);
 router.get('/account/:id/services', controllerCustom.services);
 router.get('/account/:id/schedules', controllerCustom.schedules);
 router.post('/account/:id/schedules', controllerCustom.createSchedule);
+router.post('/account/trial', controllerCustom.createAccountAndUser);
 router.put('/account/:id/config', controllerCustom.updateAccountConfig);
 router.put('/account/:id/token', controllerCustom.updateAccountToken);
 

@@ -7,6 +7,7 @@ import Admin from './Admin';
 import Billings from './Billings';
 import Templates from './Templates';
 import Campaigns from './Campaigns';
+import Auth from './Auth';
 
 export default {
   Schedules,
@@ -18,4 +19,5 @@ export default {
   Billings,
   Templates,
   Campaigns,
+  Auth,
 };

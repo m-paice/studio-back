@@ -1,4 +1,5 @@
 import sequelize, { Op } from 'sequelize';
+import { addDays } from 'date-fns';
 
 import AccountsRepository from '../repository/Accounts';
 import { AccountInstance } from '../models/Accounts';
@@ -13,12 +14,9 @@ export class AccountsResource extends BaseResource<AccountInstance> {
   }
 
   async findAccountByName(name, query) {
-    const nameLower = sequelize.where(
-      sequelize.fn('lower', sequelize.col('name')),
-      {
-        [Op.like]: `%${name}%`,
-      },
-    );
+    const nameLower = sequelize.where(sequelize.fn('lower', sequelize.col('name')), {
+      [Op.like]: `%${name}%`,
+    });
 
     return AccountsRepository.findMany({
       where: {
@@ -26,6 +24,22 @@ export class AccountsResource extends BaseResource<AccountInstance> {
         ...query.where,
       },
     });
+  }
+
+  async createTrial({ name }: { name: string }) {
+    const dueDate = addDays(new Date(), 30);
+
+    const payload = {
+      name,
+      trial: true,
+      enable: true,
+      dueDate,
+      type: 'schedules',
+    };
+
+    const account = await AccountsRepository.create(payload);
+
+    return account;
   }
 }
 
