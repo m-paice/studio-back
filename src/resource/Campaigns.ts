@@ -139,6 +139,16 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
 
     if (campaign.users.length) {
       campaign.users.forEach((item) => {
+        if (template) {
+          content = handleReplaceAll({
+            mensagem: template.content,
+            contato: item.name,
+            dia: null,
+            diaDaSemana: null,
+            horario: null,
+          });
+        }
+
         const sendPayload = {
           userId: item.id,
           campaignId,
@@ -153,9 +163,9 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
     if (campaign.schedules.length) {
       campaign.schedules.forEach((item) => {
         if (template) {
-          const selectDay = format(item.scheduleAt, 'dd/MM', { locale: ptBR });
-          const dayOfWeek = format(item.scheduleAt, 'cccc', { locale: ptBR });
-          const selectHour = format(item.scheduleAt, 'HH:mm', { locale: ptBR });
+          const selectDay = format(new Date(item.scheduleAt), 'dd/MM', { locale: ptBR });
+          const dayOfWeek = format(new Date(item.scheduleAt), 'cccc', { locale: ptBR });
+          const selectHour = format(new Date(item.scheduleAt), 'HH:mm', { locale: ptBR });
 
           content = handleReplaceAll({
             mensagem: template.content,
