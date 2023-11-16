@@ -11,6 +11,8 @@ export type CampaignInstance = {
   name: string;
   status: 'pending' | 'processing' | 'done';
   content: string;
+  scheduleAt: Date;
+  timeBeforeSchedule: number;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -35,6 +37,8 @@ const Campaign = sequelize.define(
     name: Sequelize.STRING,
     status: Sequelize.STRING,
     content: Sequelize.TEXT,
+    scheduleAt: Sequelize.DATE,
+    timeBeforeSchedule: Sequelize.DECIMAL,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,

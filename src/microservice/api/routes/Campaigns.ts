@@ -7,7 +7,7 @@ import { enableAccount } from '../../../middleware/enableAccount';
 import { accountContext } from '../../../middleware/accountContext';
 import { promiseHandler } from '../../../utils/routing';
 
-const whiteList = ['users', 'schedules'];
+const whiteList = ['users', 'schedules', 'template'];
 
 const controller = controllerDefaut(resource.Campaigns, whiteList);
 
