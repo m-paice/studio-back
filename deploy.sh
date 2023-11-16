@@ -13,4 +13,6 @@ else
   # Constrói a imagem com a versão e faz push para o registro Docker
   docker build -t $IMAGE_TAG .
   docker push $IMAGE_TAG
+
+  echo $IMAGE_TAG
 fi

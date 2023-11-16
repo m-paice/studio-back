@@ -1,4 +1,5 @@
-import { format } from 'date-fns';
+import { Op } from 'sequelize';
+import { endOfDay, format, startOfDay } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { CampaignInstance } from '../models/Campaigns';
@@ -31,7 +32,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
       repository: CampaignsRepository,
       entity: 'Campaign',
       onCreated: async (props) => {
-        const body = props.body as { users: string[]; schedules: string[] };
+        const body = props.body as { users: string[]; scheduleAt: Date };
         const newRecord = props.new as CampaignInstance;
 
         if (body.users?.length) {
@@ -42,16 +43,28 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
           });
         }
 
-        if (body.schedules?.length) {
-          await queuedAsyncMap(body.schedules, async (item) => {
-            const schedule = await ScheduleResource.findById(item);
+        if (body?.scheduleAt) {
+          const startAt = startOfDay(body.scheduleAt);
+          const endAt = endOfDay(body.scheduleAt);
+
+          const schedules = await ScheduleResource.findMany({
+            where: {
+              accountId: newRecord.accountId,
+              createdAt: {
+                [Op.between]: [startAt, endAt],
+              },
+            },
+          });
+
+          await queuedAsyncMap(schedules, async (item) => {
+            const schedule = await ScheduleResource.findById(item.id);
 
             await newRecord.addSchedule(schedule, { through: { status: CAMPAIGN_PENDING } });
           });
         }
       },
       onUpdated: async (props) => {
-        const body = props.body as { users: string[]; schedules: string[] };
+        const body = props.body as { users: string[]; scheduleAt: Date };
         const newRecord = props.new as CampaignInstance;
 
         /** ATUALIZANDO USUARIOS */
@@ -70,18 +83,27 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
         }
 
         /** ATUALIZANDO AGENDAMENTOS */
-        if (body?.schedules && Array.isArray(body.schedules) && body.schedules.length) {
+        if (body?.scheduleAt) {
           // apagar todos os agendamentos dessa campanha
           await CampaignSchedule.destroy({ where: { campaignId: props.id } });
 
-          // criar novos agendamentos
-          if (body.schedules?.length) {
-            await queuedAsyncMap(body.schedules, async (item) => {
-              const schedule = await ScheduleResource.findById(item);
+          const startAt = startOfDay(body.scheduleAt);
+          const endAt = endOfDay(body.scheduleAt);
 
-              await newRecord.addSchedule(schedule, { through: { status: CAMPAIGN_PENDING } });
-            });
-          }
+          const schedules = await ScheduleResource.findMany({
+            where: {
+              accountId: newRecord.accountId,
+              createdAt: {
+                [Op.between]: [startAt, endAt],
+              },
+            },
+          });
+
+          await queuedAsyncMap(schedules, async (item) => {
+            const schedule = await ScheduleResource.findById(item.id);
+
+            await newRecord.addSchedule(schedule, { through: { status: CAMPAIGN_PENDING } });
+          });
         }
       },
     });
