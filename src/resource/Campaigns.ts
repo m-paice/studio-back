@@ -90,6 +90,10 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
           const startAt = startOfDay(body.scheduleAt).toISOString();
           const endAt = endOfDay(body.scheduleAt).toISOString();
 
+          console.log(`scheduleAt: ${body.scheduleAt}`);
+          console.log(`startAt: ${startAt}`);
+          console.log(`endAt: ${endAt}`);
+
           const schedules = await ScheduleResource.findMany({
             where: {
               accountId: newRecord.accountId,
