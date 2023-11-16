@@ -2,6 +2,8 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { CampaignInstance } from '../models/Campaigns';
+import CampaignSchedule from '../models/CampaignSchedule';
+import CampaignUser from '../models/CampaignUser';
 import CampaignsRepository from '../repository/Campaigns';
 import BaseResource from './BaseResource';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
@@ -46,6 +48,40 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
 
             await newRecord.addSchedule(schedule, { through: { status: CAMPAIGN_PENDING } });
           });
+        }
+      },
+      onUpdated: async (props) => {
+        const body = props.body as { users: string[]; schedules: string[] };
+        const newRecord = props.new as CampaignInstance;
+
+        /** ATUALIZANDO USUARIOS */
+        if (body?.users && Array.isArray(body.users) && body.users.length) {
+          // apagar todos os usuario dessa campanha
+          await CampaignUser.destroy({ where: { campaignId: props.id } });
+
+          // criar novos usuarios
+          if (body.users?.length) {
+            await queuedAsyncMap(body.users, async (item) => {
+              const user = await UserResource.findById(item);
+
+              await newRecord.addUser(user, { through: { status: CAMPAIGN_PENDING } });
+            });
+          }
+        }
+
+        /** ATUALIZANDO AGENDAMENTOS */
+        if (body?.schedules && Array.isArray(body.schedules) && body.schedules.length) {
+          // apagar todos os agendamentos dessa campanha
+          await CampaignSchedule.destroy({ where: { campaignId: props.id } });
+
+          // criar novos agendamentos
+          if (body.schedules?.length) {
+            await queuedAsyncMap(body.schedules, async (item) => {
+              const schedule = await ScheduleResource.findById(item);
+
+              await newRecord.addSchedule(schedule, { through: { status: CAMPAIGN_PENDING } });
+            });
+          }
         }
       },
     });
