@@ -163,9 +163,9 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
     if (campaign.schedules.length) {
       campaign.schedules.forEach((item) => {
         if (template) {
-          const selectDay = format(new Date(item.scheduleAt), 'dd/MM', { locale: ptBR });
+          const selectDay = format(new Date(item.scheduleAt), 'dd/MMMM', { locale: ptBR });
           const dayOfWeek = format(new Date(item.scheduleAt), 'cccc', { locale: ptBR });
-          const selectHour = format(new Date(item.scheduleAt), 'HH:mm', { locale: ptBR });
+          const selectHour = format(new Date(item.scheduleAt), 'HH:mm');
 
           content = handleReplaceAll({
             mensagem: template.content,
