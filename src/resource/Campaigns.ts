@@ -44,8 +44,8 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
         }
 
         if (body?.scheduleAt) {
-          const startAt = startOfDay(body.scheduleAt).toISOString();
-          const endAt = endOfDay(body.scheduleAt).toISOString();
+          const startAt = startOfDay(new Date(body.scheduleAt)).toISOString();
+          const endAt = endOfDay(new Date(body.scheduleAt)).toISOString();
 
           const schedules = await ScheduleResource.findMany({
             where: {
@@ -87,12 +87,8 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
           // apagar todos os agendamentos dessa campanha
           await CampaignSchedule.destroy({ where: { campaignId: props.id } });
 
-          const startAt = startOfDay(body.scheduleAt).toISOString();
-          const endAt = endOfDay(body.scheduleAt).toISOString();
-
-          console.log(`scheduleAt: ${body.scheduleAt}`);
-          console.log(`startAt: ${startAt}`);
-          console.log(`endAt: ${endAt}`);
+          const startAt = startOfDay(new Date(body.scheduleAt)).toISOString();
+          const endAt = endOfDay(new Date(body.scheduleAt)).toISOString();
 
           const schedules = await ScheduleResource.findMany({
             where: {
