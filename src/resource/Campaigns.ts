@@ -50,7 +50,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
           const schedules = await ScheduleResource.findMany({
             where: {
               accountId: newRecord.accountId,
-              createdAt: {
+              scheduleAt: {
                 [Op.between]: [startAt, endAt],
               },
             },
@@ -93,7 +93,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
           const schedules = await ScheduleResource.findMany({
             where: {
               accountId: newRecord.accountId,
-              createdAt: {
+              scheduleAt: {
                 [Op.between]: [startAt, endAt],
               },
             },
