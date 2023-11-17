@@ -19,11 +19,8 @@ import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../consta
 import { handleReplaceAll } from './helpers/replaceAll';
 
 interface Content {
-  userId?: string;
-  scheduleId?: string;
-  campaignId: string;
-  content: string;
-  phoneNumber: string;
+  to: string;
+  body: string;
 }
 
 export class CampaignsResource extends BaseResource<CampaignInstance> {
@@ -150,10 +147,13 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
         }
 
         const sendPayload = {
-          userId: item.id,
-          campaignId,
-          content,
-          phoneNumber: item.cellPhone,
+          // userId: item.id,
+          // campaignId,
+          // content,
+          // phoneNumber: item.cellPhone,
+
+          to: `55${item.cellPhone}`,
+          body: content,
         };
 
         payload.push(sendPayload);
@@ -177,11 +177,14 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
         }
 
         const sendPayload = {
-          userId: item.user.id,
-          scheduleId: item.id,
-          campaignId,
-          content,
-          phoneNumber: item.user.cellPhone,
+          // userId: item.user.id,
+          // scheduleId: item.id,
+          // campaignId,
+          // content,
+          // phoneNumber: item.user.cellPhone,
+
+          to: `55${item.user.cellPhone}`,
+          body: content,
         };
 
         payload.push(sendPayload);

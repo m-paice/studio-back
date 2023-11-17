@@ -13,7 +13,6 @@ import setupSequelize from './services/setupSequelize';
 import { AmqpServer, amqpClient } from './services/amqp';
 // microservices
 import routesApi from './microservice/api/routes';
-import { sender } from './microservice/sender';
 // middleware
 import { limiter } from './middleware/rateLimit';
 
@@ -84,10 +83,6 @@ class Server {
   async microservices() {
     await this.amqpClient.start();
     await this.amqpClient.setup();
-    await this.amqpClient.consumer({
-      queue: 'send',
-      callback: async (message) => sender(JSON.parse(message)),
-    });
   }
 
   metrics() {
