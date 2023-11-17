@@ -5,16 +5,19 @@ import { HttpError } from '../utils/error/HttpError';
 
 export class AuthResource {
   async generateHash(password: string): Promise<string> {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
     return hash;
   }
 
   async compareHash(oldPassword: string, password: string) {
-    return bcrypt.compareSync(oldPassword, password);
+    return bcrypt.compare(oldPassword, password);
   }
 
   async authLogin({ username, password }: { username: string; password: string }) {
+    console.log(`usernam: ${username}`);
+    console.log(`usernam: ${password}`);
+
     const user = await usersResource.findOne({
       where: { cellPhone: username },
       include: 'account',
