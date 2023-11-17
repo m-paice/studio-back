@@ -11,17 +11,22 @@ export class AuthResource {
   }
 
   async compareHash(oldPassword: string, password: string) {
+    console.log(`oldPassword ${oldPassword}`);
+    console.log(`password ${password}`);
+
     return bcrypt.compare(oldPassword, password);
   }
 
   async authLogin({ username, password }: { username: string; password: string }) {
-    console.log(`usernam: ${username}`);
-    console.log(`usernam: ${password}`);
+    console.log(`username: ${username}`);
+    console.log(`password: ${password}`);
 
     const user = await usersResource.findOne({
       where: { cellPhone: username },
       include: 'account',
     });
+
+    console.log(`user: ${user.id} - ${user.name}`);
 
     if (!user) throw new HttpError(401, 'invalid credentials');
 
