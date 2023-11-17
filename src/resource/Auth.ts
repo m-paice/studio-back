@@ -1,4 +1,6 @@
+import { Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
+
 import { generateToken } from '../middleware/auth';
 import usersResource from './Users';
 import { HttpError } from '../utils/error/HttpError';
@@ -11,27 +13,22 @@ export class AuthResource {
   }
 
   async compareHash(oldPassword: string, password: string) {
-    console.log(`oldPassword ${oldPassword}`);
-    console.log(`password ${password}`);
-
     return bcrypt.compare(oldPassword, password);
   }
 
   async authLogin({ username, password }: { username: string; password: string }) {
-    console.log(`username: ${username}`);
-    console.log(`password: ${password}`);
-
     const user = await usersResource.findOne({
-      where: { cellPhone: username },
+      where: {
+        cellPhone: username,
+        password: {
+          [Op.ne]: null as any,
+        },
+      },
       include: 'account',
     });
-
-    console.log(`user: ${user.id} - ${user.name} - ${JSON.stringify(user)}`);
-
     if (!user) throw new HttpError(401, 'invalid credentials');
 
     const checkPassword = await this.compareHash(password, user.password);
-
     if (!checkPassword) throw new HttpError(401, 'invalid credentials');
 
     const token = generateToken({
