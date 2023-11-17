@@ -26,7 +26,7 @@ export class AuthResource {
       include: 'account',
     });
 
-    console.log(`user: ${user.id} - ${user.name}`);
+    console.log(`user: ${user.id} - ${user.name} - ${JSON.stringify(user)}`);
 
     if (!user) throw new HttpError(401, 'invalid credentials');
 
