@@ -131,11 +131,6 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
       },
     });
 
-    const title = {
-      agendamento_lembrete: 'reminder',
-      agendamento_confirmado: 'confirmation',
-    };
-
     const payload: Message[] = [];
 
     if (campaign.schedules.length) {
@@ -145,7 +140,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
         const selectHour = format(new Date(item.scheduleAt), 'HH:mm');
 
         payload.push({
-          template: title[template.title] || '',
+          template: template.name,
           data: {
             to: `+55${item.user.cellPhone}`,
             client: item.user.name,
