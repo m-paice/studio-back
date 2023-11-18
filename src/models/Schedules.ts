@@ -4,9 +4,11 @@ import sequelize from '../services/sequelize';
 import { ServiceInstance } from './Services';
 import { UserInstance } from './Users';
 import { ServiceScheduleInstance } from './ServiceSchedule';
+import { AccountInstance } from './Accounts';
 
 export type ScheduleInstance = {
   id: string;
+  account: AccountInstance;
   accountId: string;
   user: UserInstance;
   userId: string;

@@ -2,25 +2,34 @@ import { Op } from 'sequelize';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
+import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
+import { amqpClient } from '../services/amqp';
+import queuedAsyncMap from '../utils/queuedAsyncMap';
+import { HttpError } from '../utils/error/HttpError';
 import { CampaignInstance } from '../models/Campaigns';
 import CampaignSchedule from '../models/CampaignSchedule';
-import CampaignUser from '../models/CampaignUser';
-import CampaignsRepository from '../repository/Campaigns';
-import BaseResource from './BaseResource';
-import queuedAsyncMap from '../utils/queuedAsyncMap';
-import UserResource from './Users';
-import ScheduleResource from './Schedules';
-import TemplatesResource from './Templates';
-import { amqpClient } from '../services/amqp';
-import { HttpError } from '../utils/error/HttpError';
 import Schedule from '../models/Schedules';
 import User from '../models/Users';
-import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
-import { handleReplaceAll } from './helpers/replaceAll';
+import Account from '../models/Accounts';
+import Services from '../models/Services';
+import CampaignsRepository from '../repository/Campaigns';
+import BaseResource from './BaseResource';
+import ScheduleResource from './Schedules';
+import TemplatesResource from './Templates';
+import UserResource from './Users';
 
-interface Content {
-  to: string;
-  body: string;
+interface Message {
+  template: string;
+  data: {
+    to: string;
+    client: string;
+    account: string;
+    service: string;
+    date: string;
+    time: string;
+    scheduleTime: string;
+    link: string;
+  };
 }
 
 export class CampaignsResource extends BaseResource<CampaignInstance> {
@@ -31,14 +40,6 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
       onCreated: async (props) => {
         const body = props.body as { users: string[]; scheduleAt: Date };
         const newRecord = props.new as CampaignInstance;
-
-        if (body.users?.length) {
-          await queuedAsyncMap(body.users, async (item) => {
-            const user = await UserResource.findById(item);
-
-            await newRecord.addUser(user, { through: { status: CAMPAIGN_PENDING } });
-          });
-        }
 
         if (body?.scheduleAt) {
           const startAt = startOfDay(new Date(body.scheduleAt)).toISOString();
@@ -63,21 +64,6 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
       onUpdated: async (props) => {
         const body = props.body as { users: string[]; scheduleAt: Date };
         const newRecord = props.new as CampaignInstance;
-
-        /** ATUALIZANDO USUARIOS */
-        if (body?.users && Array.isArray(body.users) && body.users.length) {
-          // apagar todos os usuario dessa campanha
-          await CampaignUser.destroy({ where: { campaignId: props.id } });
-
-          // criar novos usuarios
-          if (body.users?.length) {
-            await queuedAsyncMap(body.users, async (item) => {
-              const user = await UserResource.findById(item);
-
-              await newRecord.addUser(user, { through: { status: CAMPAIGN_PENDING } });
-            });
-          }
-        }
 
         /** ATUALIZANDO AGENDAMENTOS */
         if (body?.scheduleAt) {
@@ -110,7 +96,6 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
   async start({ campaignId }: { campaignId: string }) {
     const campaign = await CampaignsRepository.findById(campaignId, {
       include: [
-        'users',
         'template',
         {
           model: Schedule,
@@ -120,6 +105,14 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
               model: User,
               as: 'user',
             },
+            {
+              model: Account,
+              as: 'account',
+            },
+            {
+              model: Services,
+              as: 'services',
+            },
           ],
         },
       ],
@@ -128,66 +121,37 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
     if (!campaign) throw new HttpError(500, 'campaign not found!');
     if (campaign.status === CAMPAIGN_DONE) throw new HttpError(500, 'campaign finished!');
 
-    const payload: Content[] = [];
+    const template = await TemplatesResource.findById(campaign.templateId);
+    if (!template) throw new HttpError(500, 'template is required');
 
-    let { content } = campaign;
+    const userAdmin = await UserResource.findOne({
+      where: {
+        accountId: campaign.accountId,
+        isSuperAdmin: true,
+      },
+    });
 
-    const template = campaign.templateId ? await TemplatesResource.findById(campaign.templateId) : null;
-
-    if (campaign.users.length) {
-      campaign.users.forEach((item) => {
-        if (template) {
-          content = handleReplaceAll({
-            mensagem: template.content,
-            contato: item.name,
-            dia: null,
-            diaDaSemana: null,
-            horario: null,
-          });
-        }
-
-        const sendPayload = {
-          // userId: item.id,
-          // campaignId,
-          // content,
-          // phoneNumber: item.cellPhone,
-
-          to: `55${item.cellPhone}`,
-          body: content,
-        };
-
-        payload.push(sendPayload);
-      });
-    }
+    const payload: Message[] = [];
 
     if (campaign.schedules.length) {
       campaign.schedules.forEach((item) => {
-        if (template) {
-          const selectDay = format(new Date(item.scheduleAt), 'dd/MMMM', { locale: ptBR });
-          const dayOfWeek = format(new Date(item.scheduleAt), 'cccc', { locale: ptBR });
-          const selectHour = format(new Date(item.scheduleAt), 'HH:mm');
+        const selectDay = format(new Date(item.scheduleAt), 'dd/MMMM', { locale: ptBR });
+        const dayOfWeek = format(new Date(item.scheduleAt), 'cccc', { locale: ptBR });
+        const selectHour = format(new Date(item.scheduleAt), 'HH:mm');
 
-          content = handleReplaceAll({
-            mensagem: template.content,
-            contato: item.user.name,
-            dia: selectDay,
-            diaDaSemana: dayOfWeek,
-            horario: selectHour,
-          });
-        }
-
-        const sendPayload = {
-          // userId: item.user.id,
-          // scheduleId: item.id,
-          // campaignId,
-          // content,
-          // phoneNumber: item.user.cellPhone,
-
-          to: `55${item.user.cellPhone}`,
-          body: content,
-        };
-
-        payload.push(sendPayload);
+        payload.push({
+          template: template.title,
+          data: {
+            to: `+55${item.user.cellPhone}`,
+            client: item.user.name,
+            account: item.account.name,
+            service: item.services.map((service) => service.name).join(' + '),
+            date: `${selectDay} (${dayOfWeek})`,
+            time: selectHour,
+            scheduleTime: campaign.timeBeforeSchedule.toString(),
+            link: `https://wa.me/55${userAdmin.cellPhone}`,
+          },
+        });
       });
     }
 

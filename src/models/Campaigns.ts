@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import sequelize from '../services/sequelize';
 import { UserInstance } from './Users';
 import { ScheduleInstance } from './Schedules';
+import { AccountInstance } from './Accounts';
 
 export type CampaignInstance = {
   id: string;
@@ -15,6 +16,8 @@ export type CampaignInstance = {
   timeBeforeSchedule: number;
   createdAt?: Date;
   updatedAt?: Date;
+
+  account: AccountInstance[];
 
   users: UserInstance[];
   schedules: ScheduleInstance[];
