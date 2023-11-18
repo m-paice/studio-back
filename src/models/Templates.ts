@@ -6,6 +6,7 @@ export type TemplateInstance = {
   id: string;
   accountId: string;
   title: string;
+  name: string;
   content: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -21,6 +22,7 @@ const Template = sequelize.define(
       primaryKey: true,
     },
     title: Sequelize.STRING,
+    name: Sequelize.STRING,
     content: Sequelize.TEXT,
     createdAt: {
       type: Sequelize.DATE,
