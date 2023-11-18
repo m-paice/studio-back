@@ -8,16 +8,18 @@ import {
   AMQP_USERNAME,
   EXCHANGE_NAME,
   QUEUE_NAME,
-  QueueName,
+  ROUTING_KEY_NAME,
+  QUEUES,
 } from '../constants/amqp';
 
 const logger = debug('@amqp');
 
 interface PublishInExchangeOptions<T> {
   message: T;
+  routingKey: ROUTING_KEY_NAME;
 }
 interface ConsumerOptions {
-  queue: QueueName;
+  queue: QUEUE_NAME;
   callback(message: string): void;
 }
 
@@ -51,18 +53,21 @@ export class AmqpServer {
 
   // setup
   async setup(): Promise<void> {
-    await this.channel.assertExchange(EXCHANGE_NAME, 'fanout', { durable: false });
+    await this.channel.assertExchange(EXCHANGE_NAME, 'topic', {
+      durable: false,
+    });
 
-    const assertQueue = await this.channel.assertQueue(QUEUE_NAME, { durable: true });
-
-    await this.channel.bindQueue(assertQueue.queue, EXCHANGE_NAME, '');
+    // creating queue
+    await Promise.all(QUEUES.map(async (item) => this.channel.assertQueue(item.name)));
+    // bind queue with exchange
+    await Promise.all(QUEUES.map(async (item) => this.channel.bindQueue(item.name, EXCHANGE_NAME, item.routingKey)));
   }
 
   // sender
-  async publishQueue<T>({ message }: PublishInExchangeOptions<T>): Promise<boolean> {
+  async publishInExchangeByRoutingKey<T>({ message, routingKey }: PublishInExchangeOptions<T>): Promise<boolean> {
     const payload = JSON.stringify(message);
 
-    return this.channel.publish(EXCHANGE_NAME, '', Buffer.from(payload));
+    return this.channel.publish(EXCHANGE_NAME, routingKey, Buffer.from(payload));
   }
 
   // listener

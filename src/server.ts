@@ -83,6 +83,12 @@ class Server {
   async microservices() {
     await this.amqpClient.start();
     await this.amqpClient.setup();
+    await amqpClient.consumer({
+      queue: 'receive',
+      callback: async (message) => {
+        console.log(`data from queue receive: ${JSON.parse(message)}`);
+      },
+    });
   }
 
   metrics() {

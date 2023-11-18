@@ -161,7 +161,9 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
       return true;
     }
 
-    await Promise.all(payload.map(async (item) => amqpClient.publishQueue({ message: item })));
+    await Promise.all(
+      payload.map(async (item) => amqpClient.publishInExchangeByRoutingKey({ routingKey: 'message', message: item })),
+    );
     await CampaignsRepository.updateById(campaignId, { status: CAMPAIGN_PROCECSSING });
 
     return true;

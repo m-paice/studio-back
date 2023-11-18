@@ -1,6 +1,8 @@
-export type QueueName = 'send';
+export type QUEUE_NAME = 'send' | 'receive';
+export type ROUTING_KEY_NAME = 'message' | 'report';
+
 export interface QueueOptions {
-  name: QueueName;
+  name: QUEUE_NAME;
   routingKey: string;
 }
 
@@ -10,4 +12,7 @@ export const AMQP_HOST = process.env.AMQP_HOST ? process.env.AMQP_HOST : 'localh
 export const AMQP_PORT = process.env.AMQP_PORT ? parseInt(process.env.AMQP_PORT, 10) : 5671;
 
 export const EXCHANGE_NAME = 'record';
-export const QUEUE_NAME = 'send';
+export const QUEUES = [
+  { name: 'send', routingKey: 'message' },
+  { name: 'receive', routingKey: 'report' },
+];
