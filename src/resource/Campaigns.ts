@@ -29,6 +29,7 @@ interface Message {
     time: string;
     scheduleTime: string;
     link: string;
+    adminCellPhone: string;
   };
 }
 
@@ -150,6 +151,7 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
             time: selectHour,
             scheduleTime: campaign.timeBeforeSchedule.toString(),
             link: `https://wa.me/55${userAdmin.cellPhone}`,
+            adminCellPhone: userAdmin.cellPhone,
           },
         });
       });
