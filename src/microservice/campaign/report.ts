@@ -6,12 +6,20 @@ import { HttpError } from '../../utils/error/HttpError';
 type Status = 'pending' | 'sent' | 'ready' | 'failed';
 
 interface ReportData {
-  campaignId: string;
-  scheduleId: string;
-  status: Status;
+  message: {
+    data: {
+      campaignId: string;
+      scheduleId: string;
+      status: Status;
+    };
+  };
 }
 
-export async function createReport({ campaignId, scheduleId, status }: ReportData) {
+export async function createReport({
+  message: {
+    data: { campaignId, scheduleId, status },
+  },
+}: ReportData) {
   const campaign = await resource.Campaigns.findById(campaignId, { include: ['schedules'] });
 
   if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
