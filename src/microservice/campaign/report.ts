@@ -21,7 +21,7 @@ export async function createReport({
   },
 }: ReportData) {
   try {
-    if (!campaignId || scheduleId || status) throw new HttpError(500, 'invalid params');
+    if (!campaignId || !scheduleId || !status) throw new HttpError(500, 'invalid params');
 
     const campaign = await resource.Campaigns.findById(campaignId);
     if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
