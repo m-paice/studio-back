@@ -36,7 +36,9 @@ export async function createReport(data: ReportData) {
       },
     );
 
-    if ((await CampaignSchedule.count({ where: { status: CAMPAIGN_PENDING } })) === 0) {
+    const countItemsPending = await CampaignSchedule.count({ where: { status: CAMPAIGN_PENDING } });
+    console.log(`countItemsPending: ${countItemsPending}`);
+    if (countItemsPending === 0) {
       await resource.Campaigns.updateById(campaignId, { status: CAMPAIGN_DONE });
     }
   } catch (error) {
