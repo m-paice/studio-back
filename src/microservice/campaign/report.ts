@@ -1,5 +1,5 @@
 import { CAMPAIGN_DONE, CAMPAIGN_PENDING } from '../../constants/campaign';
-import CampaignSchedule from '../../repository/CampaignSchedule';
+import CampaignSchedule from '../../models/CampaignSchedule';
 import resource from '../../resource';
 import { HttpError } from '../../utils/error/HttpError';
 
@@ -20,21 +20,27 @@ export async function createReport({
     data: { campaignId, scheduleId, status },
   },
 }: ReportData) {
-  const campaign = await resource.Campaigns.findById(campaignId);
+  try {
+    if (!campaignId || scheduleId || status) throw new HttpError(500, 'invalid params');
 
-  if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
-  if (campaign.status === CAMPAIGN_DONE) throw new Error('campaign is finished');
+    const campaign = await resource.Campaigns.findById(campaignId);
+    if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
+    if (campaign.status === CAMPAIGN_DONE) throw new Error('campaign is finished');
 
-  const campaignSchedule = await CampaignSchedule.findOne({
-    where: {
-      campaignId,
-      scheduleId,
-    },
-  });
+    await CampaignSchedule.update(
+      { status },
+      {
+        where: {
+          campaignId,
+          scheduleId,
+        },
+      },
+    );
 
-  await CampaignSchedule.update(campaignSchedule, { status }, {});
-
-  if ((await CampaignSchedule.count({ where: { status: CAMPAIGN_PENDING } })) === 0) {
-    await resource.Campaigns.updateById(campaignId, { status: CAMPAIGN_DONE });
+    if ((await CampaignSchedule.count({ where: { status: CAMPAIGN_PENDING } })) === 0) {
+      await resource.Campaigns.updateById(campaignId, { status: CAMPAIGN_DONE });
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
