@@ -7,11 +7,18 @@ import { enableAccount } from '../../../middleware/enableAccount';
 import { accountContext } from '../../../middleware/accountContext';
 import { promiseHandler } from '../../../utils/routing';
 import Schedule from '../../../models/Schedules';
+import User from '../../../models/Users';
 
 const whiteList = [
   {
     model: Schedule,
     as: 'schedules',
+    include: [
+      {
+        model: User,
+        as: 'user',
+      },
+    ],
   },
   'template',
 ];
