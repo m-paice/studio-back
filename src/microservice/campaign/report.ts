@@ -1,4 +1,5 @@
 import { CAMPAIGN_DONE, CAMPAIGN_PENDING } from '../../constants/campaign';
+import Schedule from '../../models/Schedules';
 import CampaignSchedule from '../../repository/CampaignSchedule';
 import resource from '../../resource';
 import { HttpError } from '../../utils/error/HttpError';
@@ -20,7 +21,14 @@ export async function createReport({
     data: { campaignId, scheduleId, status },
   },
 }: ReportData) {
-  const campaign = await resource.Campaigns.findById(campaignId, { include: ['schedules'] });
+  const campaign = await resource.Campaigns.findById(campaignId, {
+    include: [
+      {
+        model: Schedule,
+        as: 'schedules',
+      },
+    ],
+  });
 
   if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
   if (!campaign.schedules.length) throw new HttpError(500, 'campaign no has schedules');
