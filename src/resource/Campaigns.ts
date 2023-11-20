@@ -31,6 +31,10 @@ interface Message {
     link: string;
     adminCellPhone: string;
   };
+  info: {
+    campaignId: string;
+    scheduleId: string;
+  };
 }
 
 export class CampaignsResource extends BaseResource<CampaignInstance> {
@@ -152,6 +156,10 @@ export class CampaignsResource extends BaseResource<CampaignInstance> {
             scheduleTime: campaign.timeBeforeSchedule.toString(),
             link: `https://wa.me/55${userAdmin.cellPhone}`,
             adminCellPhone: userAdmin.cellPhone,
+          },
+          info: {
+            campaignId,
+            scheduleId: item.id,
           },
         });
       });

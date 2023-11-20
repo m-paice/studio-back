@@ -15,6 +15,7 @@ import { AmqpServer, amqpClient } from './services/amqp';
 import routesApi from './microservice/api/routes';
 // middleware
 import { limiter } from './middleware/rateLimit';
+import { createReport } from './microservice/campaign';
 
 export const restResponseTimeDurationSeconds = new client.Histogram({
   name: 'rest_response_time_duration_seconds',
@@ -87,6 +88,7 @@ class Server {
       queue: 'receive',
       callback: async (message) => {
         console.log(`data from queue receive: ${JSON.stringify(JSON.parse(message))}`);
+        await createReport(JSON.parse(message));
       },
     });
   }
