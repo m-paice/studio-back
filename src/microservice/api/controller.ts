@@ -16,7 +16,7 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
           ...query,
           ...(whiteList && { include: whiteList }),
         })
-        .then((data: Partial<T>) => data);
+        .then((data: Partial<T>) => ({ data }));
 
       return res.json(response);
     } catch (error: any) {
