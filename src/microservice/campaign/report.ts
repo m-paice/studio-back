@@ -15,13 +15,12 @@ interface ReportData {
   };
 }
 
-export async function createReport({
-  message: {
-    data: { campaignId, scheduleId, status },
-  },
-}: ReportData) {
+export async function createReport(data: ReportData) {
+  const { campaignId, scheduleId, status } = data.message.data;
+
   try {
-    if (!campaignId || !scheduleId || !status) throw new HttpError(500, 'invalid params');
+    if (!campaignId || !scheduleId || !status)
+      throw new HttpError(500, `invalid params ${JSON.stringify(data.message.data)}`);
 
     const campaign = await resource.Campaigns.findById(campaignId);
     if (!campaign) throw new HttpError(500, `campaign ${campaignId} not found`);
