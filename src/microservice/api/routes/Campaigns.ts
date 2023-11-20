@@ -6,8 +6,15 @@ import { billing } from '../../../middleware/billing';
 import { enableAccount } from '../../../middleware/enableAccount';
 import { accountContext } from '../../../middleware/accountContext';
 import { promiseHandler } from '../../../utils/routing';
+import Schedule from '../../../models/Schedules';
 
-const whiteList = ['users', 'schedules', 'template'];
+const whiteList = [
+  {
+    model: Schedule,
+    as: 'schedules',
+  },
+  'template',
+];
 
 const controller = controllerDefaut(resource.Campaigns, whiteList);
 
