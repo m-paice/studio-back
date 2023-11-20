@@ -37,7 +37,7 @@ export async function createReport(data: ReportData) {
     );
 
     const countItemsPending = await CampaignSchedule.count({
-      where: { campaignId, scheduleId, status: CAMPAIGN_PENDING },
+      where: { campaignId, status: CAMPAIGN_PENDING },
     });
     if (countItemsPending === 0) {
       await resource.Campaigns.updateById(campaignId, { status: CAMPAIGN_DONE });
