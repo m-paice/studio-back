@@ -56,7 +56,7 @@ const router = Router();
 router.use(accountContext);
 router.use(billing);
 
-router.get('/', controller.index);
+router.get('/', controller.many);
 router.post('/', controllerCustom.reports);
 router.post('/register-out', controllerCustom.registerOut);
 router.delete('/:id', controller.destroy);
