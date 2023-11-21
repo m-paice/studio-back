@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { amqpClient } from '../../services/amqp';
@@ -23,7 +23,7 @@ export async function sendMessage({ campaign, schedule }: Send) {
 
   const selectDay = format(new Date(schedule.scheduleAt), 'dd/MMMM', { locale: ptBR });
   const dayOfWeek = format(new Date(schedule.scheduleAt), 'cccc', { locale: ptBR });
-  const selectHour = format(new Date(schedule.scheduleAt), 'HH:mm', { locale: ptBR });
+  const selectHour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
 
   const payload = {
     template: template.name,
