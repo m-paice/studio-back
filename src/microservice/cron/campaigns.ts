@@ -49,6 +49,11 @@ export const handleCampaigns = async () => {
       if (campaignSchedule.status !== CAMPAIGN_PENDING) return;
 
       const schedulePreviousTime = subHours(new Date(schedule.scheduleAt), campaign.timeBeforeSchedule);
+      console.log(`timeBeforeSchedule: ${campaign.timeBeforeSchedule}`);
+      console.log(`scheduleAt: ${schedule.scheduleAt}`);
+      console.log(`schedulePreviousTime: ${schedulePreviousTime}`);
+      console.log(`current: ${new Date()}`);
+
       if (isAfter(new Date(), schedulePreviousTime)) {
         await sendMessage({
           campaign,
