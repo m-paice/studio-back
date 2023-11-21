@@ -22,7 +22,7 @@ const controllerCustom = {
     return response;
   }),
   import: promiseHandler(async (req) => {
-    const response = await usersResource.import({ payload: req.body.users, accountId: req.body.accountId });
+    const response = await usersResource.import({ payload: req.body.users, accountId: req.accountId });
 
     return response;
   }),
