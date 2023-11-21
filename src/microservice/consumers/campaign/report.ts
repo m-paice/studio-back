@@ -1,7 +1,7 @@
-import { CAMPAIGN_DONE, CAMPAIGN_PENDING } from '../../constants/campaign';
-import CampaignSchedule from '../../models/CampaignSchedule';
-import resource from '../../resource';
-import { HttpError } from '../../utils/error/HttpError';
+import { CAMPAIGN_DONE, CAMPAIGN_PENDING } from '../../../constants/campaign';
+import CampaignSchedule from '../../../models/CampaignSchedule';
+import resource from '../../../resource';
+import { HttpError } from '../../../utils/error/HttpError';
 
 type Status = 'pending' | 'sent' | 'ready' | 'failed';
 

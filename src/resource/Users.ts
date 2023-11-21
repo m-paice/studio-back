@@ -4,6 +4,7 @@ import { UserInstance } from '../models/Users';
 import BaseResource from './BaseResource';
 import AuthResource from './Auth';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
+import { amqpClient } from '../services/amqp';
 
 export class UserResource extends BaseResource<UserInstance> {
   constructor() {
@@ -32,20 +33,22 @@ export class UserResource extends BaseResource<UserInstance> {
   }
 
   async import({ payload, accountId }: { payload: { name: string; phone: string }[]; accountId: string }) {
-    await queuedAsyncMap(payload, async (user) => {
-      const cellPhone = (user.phone.match(/\d+/g) || []).join('');
-
-      const userExist = await UserRepository.findOne({ where: { accountId, name: user.name, cellPhone } });
-
-      if (!userExist) {
-        await UserRepository.create({
-          accountId,
-          name: user.name,
-          cellPhone,
-          type: 'pf',
+    await queuedAsyncMap(
+      payload,
+      async (user) => {
+        await amqpClient.publishInExchangeByRoutingKey({
+          message: {
+            user: {
+              name: user.name,
+              phone: user.phone,
+            },
+            accountId,
+          },
+          routingKey: 'import',
         });
-      }
-    });
+      },
+      10,
+    );
   }
 
   async findUserByName(name, query) {

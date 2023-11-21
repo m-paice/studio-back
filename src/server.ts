@@ -14,7 +14,7 @@ import { AmqpServer, amqpClient } from './services/amqp';
 // microservices
 import routesApi from './microservice/api/routes';
 import { cronStart } from './microservice/cron';
-import { createReport } from './microservice/campaign';
+import { consumers } from './microservice/consumers';
 // middleware
 import { limiter } from './middleware/rateLimit';
 
@@ -85,12 +85,16 @@ class Server {
   async microservices() {
     await this.amqpClient.start();
     await this.amqpClient.setup();
-    await amqpClient.consumer({
-      queue: 'receive',
-      callback: async (message) => {
-        await createReport(JSON.parse(message));
-      },
-    });
+    await Promise.all(
+      consumers.map(async (consumer) => {
+        const [queue, job] = consumer;
+
+        await amqpClient.consumer({
+          queue,
+          callback: async (message) => job(JSON.parse(message)),
+        });
+      }),
+    );
     cronStart();
   }
 

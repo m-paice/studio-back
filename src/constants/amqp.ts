@@ -1,5 +1,5 @@
-export type QUEUE_NAME = 'send' | 'receive';
-export type ROUTING_KEY_NAME = 'message' | 'report';
+export type QUEUE_NAME = 'send' | 'receive' | 'user';
+export type ROUTING_KEY_NAME = 'message' | 'report' | 'import';
 
 export interface QueueOptions {
   name: QUEUE_NAME;
@@ -15,4 +15,5 @@ export const EXCHANGE_NAME = 'record';
 export const QUEUES = [
   { name: 'send', routingKey: 'message' },
   { name: 'receive', routingKey: 'report' },
+  { name: 'user', routingKey: 'import' },
 ];
