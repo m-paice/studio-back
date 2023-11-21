@@ -13,9 +13,10 @@ import setupSequelize from './services/setupSequelize';
 import { AmqpServer, amqpClient } from './services/amqp';
 // microservices
 import routesApi from './microservice/api/routes';
+import { cronStart } from './microservice/cron';
+import { createReport } from './microservice/campaign';
 // middleware
 import { limiter } from './middleware/rateLimit';
-import { createReport } from './microservice/campaign';
 
 export const restResponseTimeDurationSeconds = new client.Histogram({
   name: 'rest_response_time_duration_seconds',
@@ -91,6 +92,7 @@ class Server {
         await createReport(JSON.parse(message));
       },
     });
+    cronStart();
   }
 
   metrics() {
