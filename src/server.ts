@@ -88,7 +88,6 @@ class Server {
     await amqpClient.consumer({
       queue: 'receive',
       callback: async (message) => {
-        console.log(`data from queue receive: ${JSON.stringify(JSON.parse(message))}`);
         await createReport(JSON.parse(message));
       },
     });
