@@ -23,7 +23,7 @@ export async function sendMessage({ campaign, schedule }: Send) {
 
   const selectDay = format(new Date(schedule.scheduleAt), 'dd/MMMM', { locale: ptBR });
   const dayOfWeek = format(new Date(schedule.scheduleAt), 'cccc', { locale: ptBR });
-  const selectHour = format(new Date(schedule.scheduleAt), 'HH:mm');
+  const selectHour = format(new Date(schedule.scheduleAt), 'HH:mm', { locale: ptBR });
 
   const payload = {
     template: template.name,
