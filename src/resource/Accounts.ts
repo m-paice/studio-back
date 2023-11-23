@@ -4,6 +4,7 @@ import { addDays } from 'date-fns';
 import AccountsRepository from '../repository/Accounts';
 import { AccountInstance } from '../models/Accounts';
 import BaseResource from './BaseResource';
+import { DUE_DATE_TRIAL } from '../constants';
 
 export class AccountsResource extends BaseResource<AccountInstance> {
   constructor() {
@@ -27,7 +28,7 @@ export class AccountsResource extends BaseResource<AccountInstance> {
   }
 
   async createTrial({ name }: { name: string }) {
-    const dueDate = addDays(new Date(), 30);
+    const dueDate = addDays(new Date(), DUE_DATE_TRIAL);
 
     const payload = {
       name,

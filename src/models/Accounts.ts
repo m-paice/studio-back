@@ -7,8 +7,9 @@ export type AccountInstance = {
   name: string;
   type: string;
   trial: boolean;
+  credit: number;
   enable: boolean;
-  dueDate: Date;
+  dueDate: Date | null;
   config: {
     startAt: number;
     endAt: number;
@@ -21,7 +22,7 @@ export type AccountInstance = {
       sex: boolean;
       sab: boolean;
     };
-  }; // force commit
+  };
   token: string[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -42,6 +43,7 @@ const Account = sequelize.define(
       allowNull: false,
     },
     trial: Sequelize.BOOLEAN,
+    credit: Sequelize.INTEGER,
     enable: Sequelize.BOOLEAN,
     dueDate: Sequelize.DATE,
     config: Sequelize.JSONB,
