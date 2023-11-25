@@ -16,9 +16,9 @@ interface ReportData {
 }
 
 export async function createReport(data: ReportData) {
-  const { campaignId, scheduleId, status } = data.message.data;
-
   try {
+    const { campaignId, scheduleId, status } = data.message.data;
+
     if (!campaignId || !scheduleId || !status)
       throw new HttpError(500, `invalid params ${JSON.stringify(data.message.data)}`);
 
