@@ -17,6 +17,7 @@ export const handleCampaigns = async () => {
     },
     include: [
       'template',
+      'account',
       {
         model: Schedule,
         as: 'schedules',
@@ -39,7 +40,11 @@ export const handleCampaigns = async () => {
   });
 
   await queuedAsyncMap(campaigns, async (campaign) => {
+    if (!campaign.account.credit || campaign.account.credit === 0) return;
+
     await queuedAsyncMap(campaign.schedules, async (schedule) => {
+      if (!schedule.account.credit || schedule.account.credit === 0) return;
+
       const campaignSchedule = (await CampaignSchedule.findOne({
         where: {
           campaignId: campaign.id,
@@ -55,6 +60,10 @@ export const handleCampaigns = async () => {
           campaign,
           schedule,
         });
+
+        if (schedule.account.credit > 0) {
+          await resource.Accounts.updateById(schedule.account.id, { credit: schedule.account.credit - 1 });
+        }
       }
     });
   });

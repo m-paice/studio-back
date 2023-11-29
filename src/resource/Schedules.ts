@@ -1,10 +1,14 @@
+import { Op } from 'sequelize';
+import { endOfDay, startOfDay } from 'date-fns';
+
 import BaseResource from './BaseResource';
 import ScheduleRepository from '../repository/Schedules';
-import { ScheduleInstance } from '../models/Schedules';
-import ReportResource from './Reports';
+import Schedule, { ScheduleInstance } from '../models/Schedules';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
-import ServiceResource from './Services';
 import ServiceSchedule from '../models/ServiceSchedule';
+import resource from '.';
+import { CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
+import CampaignSchedule from '../models/CampaignSchedule';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -17,9 +21,28 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
 
         if (body.services?.length) {
           await queuedAsyncMap(body.services, async (item) => {
-            const service = await ServiceResource.findById(item.id);
+            const service = await resource.Services.findById(item.id);
 
             await newRecord.addService(service, { through: { isPackage: item.isPackage } });
+          });
+        }
+
+        const startAt = startOfDay(new Date(newRecord.scheduleAt)).toISOString();
+        const endAt = endOfDay(new Date(newRecord.scheduleAt)).toISOString();
+
+        const campaignInScheduleAt = await resource.Campaigns.findMany({
+          where: {
+            accountId: newRecord.accountId,
+            scheduleAt: {
+              [Op.between]: [startAt, endAt],
+            },
+            [Op.or]: [{ status: CAMPAIGN_PENDING }, { status: CAMPAIGN_PROCECSSING }],
+          },
+        });
+
+        if (campaignInScheduleAt.length) {
+          await queuedAsyncMap(campaignInScheduleAt, async (campaign) => {
+            await campaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
           });
         }
       },
@@ -34,34 +57,86 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           // criar novos serviços
           if (body.services?.length) {
             await queuedAsyncMap(body.services, async (item) => {
-              const service = await ServiceResource.findById(item.id);
+              const service = await resource.Services.findById(item.id);
 
               await newRecord.addService(service, { through: { isPackage: item.isPackage } });
             });
           }
         }
 
-        const report = await ReportResource.findOne({
+        const report = await resource.Reports.findOne({
           where: { scheduleId: props.id },
         });
 
         // verificar se existe relatorio desse agendamento
         if (report) {
-          const schedule = await ScheduleRepository.findById(props.id);
-
-          await ReportResource.createOrUpdate({
+          await resource.Reports.createOrUpdate({
             scheduleId: props.id,
             reportId: report.id,
-            accountId: schedule.accountId,
+            accountId: newRecord.accountId,
             addition: Number(newRecord.addition),
             discount: Number(newRecord.discount),
           });
         }
+
+        // verificar se existe campanha no dia do agendamento e se o agendamento ja esta na campanha
+        const startAt = startOfDay(new Date(newRecord.scheduleAt)).toISOString();
+        const endAt = endOfDay(new Date(newRecord.scheduleAt)).toISOString();
+
+        const campaignInScheduleAt = await resource.Campaigns.findMany({
+          where: {
+            accountId: newRecord.accountId,
+            scheduleAt: {
+              [Op.between]: [startAt, endAt],
+            },
+            [Op.or]: [{ status: CAMPAIGN_PENDING }, { status: CAMPAIGN_PROCECSSING }],
+          },
+          include: [
+            {
+              model: Schedule,
+              as: 'schedules',
+              where: {
+                id: {
+                  [Op.not]: newRecord.id,
+                },
+              },
+            },
+          ],
+        });
+
+        if (campaignInScheduleAt.length) {
+          await queuedAsyncMap(campaignInScheduleAt, async (campaign) => {
+            await campaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
+          });
+        }
       },
       onDeleted: async ({ id }) => {
-        const reportsBySchedule = await ReportResource.findMany({ where: { scheduleId: id } });
+        const reportsBySchedule = await resource.Reports.findMany({ where: { scheduleId: id } });
 
-        await queuedAsyncMap(reportsBySchedule, async (item) => ReportResource.destroyById(item.id));
+        await queuedAsyncMap(reportsBySchedule, async (item) => resource.Reports.destroyById(item.id));
+
+        const campaignInScheduleAt = await resource.Campaigns.findMany({
+          include: [
+            {
+              model: Schedule,
+              as: 'schedules',
+              where: {
+                id,
+              },
+            },
+          ],
+        });
+
+        if (campaignInScheduleAt.length) {
+          await queuedAsyncMap(campaignInScheduleAt, async (campaign) => {
+            await CampaignSchedule.destroy({
+              where: {
+                campaignId: campaign.id,
+                scheduleId: id,
+              },
+            });
+          });
+        }
       },
     });
   }
@@ -75,10 +150,10 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
     status: 'pending' | 'finished' | 'canceled';
     accountId: string;
   }) {
-    const scheduleUpdated = await ScheduleRepository.updateById(id, { status });
+    const scheduleUpdated = await this.updateById(id, { status });
 
     if (status === 'finished') {
-      await ReportResource.createOrUpdate({
+      await resource.Reports.createOrUpdate({
         scheduleId: scheduleUpdated.id,
         accountId,
         addition: scheduleUpdated.addition,
@@ -92,20 +167,20 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
   async revert(data: { scheduleId: string }) {
     const { scheduleId } = data;
 
-    const schedule = await ScheduleRepository.findById(scheduleId);
+    const schedule = await this.findById(scheduleId);
 
-    await ScheduleRepository.updateById(schedule.id, {
+    await this.updateById(schedule.id, {
       status: 'pending',
     });
 
-    const reports = await ReportResource.findMany({
+    const reports = await resource.Reports.findMany({
       where: {
         scheduleId: schedule.id,
       },
     });
 
     await queuedAsyncMap(reports, async (item) => {
-      await ReportResource.destroyById(item.id);
+      await resource.Reports.destroyById(item.id);
     });
 
     return true;

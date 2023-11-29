@@ -29,7 +29,7 @@ const controllerCustom = {
   start: promiseHandler(async (req) => {
     const { id } = req.params;
 
-    const response = await resource.Campaigns.start({ campaignId: id });
+    const response = await resource.Campaigns.start({ campaignId: id, accountId: req.accountId });
     return response;
   }),
 };

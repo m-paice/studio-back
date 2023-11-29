@@ -17,8 +17,7 @@ export type CampaignInstance = {
   createdAt?: Date;
   updatedAt?: Date;
 
-  account: AccountInstance[];
-
+  account: AccountInstance;
   users: UserInstance[];
   schedules: ScheduleInstance[];
 
