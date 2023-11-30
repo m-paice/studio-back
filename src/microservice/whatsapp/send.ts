@@ -1,6 +1,3 @@
-import { format, subHours } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-
 import { amqpClient } from '../../services/amqp';
 import resource from '../../resource';
 import { CampaignInstance } from '../../models/Campaigns';
@@ -14,33 +11,13 @@ interface Send {
 export async function sendMessage({ campaign, schedule }: Send) {
   const template = await resource.Templates.findById(campaign.templateId);
 
-  const userAdmin = await resource.Users.findOne({
-    where: {
-      accountId: campaign.accountId,
-      isSuperAdmin: true,
-    },
-  });
-
-  const selectDay = format(new Date(schedule.scheduleAt), 'dd/MMMM', { locale: ptBR });
-  const dayOfWeek = format(new Date(schedule.scheduleAt), 'cccc', { locale: ptBR });
-  const selectHour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
-
   const payload = {
-    template: template.name,
-    data: {
-      to: `+55${schedule.user.cellPhone}`,
-      client: schedule.user.name,
-      account: schedule.account.name,
-      service: schedule.services.map((service) => service.name).join(' + '),
-      date: `${selectDay} (${dayOfWeek})`,
-      time: selectHour,
-      scheduleTime: campaign.timeBeforeSchedule.toString(),
-      link: `https://wa.me/55${userAdmin.cellPhone}`,
-      adminCellPhone: userAdmin.cellPhone,
-    },
+    message: template.content,
+    phoneNumber: `55${schedule.user.cellPhone}`,
     info: {
       campaignId: campaign.id,
       scheduleId: schedule.id,
+      account: schedule.account.name,
     },
   };
 
