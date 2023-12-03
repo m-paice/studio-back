@@ -5,6 +5,7 @@ import ReportResource from './Reports';
 import queuedAsyncMap from '../utils/queuedAsyncMap';
 import ServiceResource from './Services';
 import ServiceSchedule from '../models/ServiceSchedule';
+import { HttpError } from '../utils/error/HttpError';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -92,21 +93,44 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
   async revert(data: { scheduleId: string }) {
     const { scheduleId } = data;
 
-    const schedule = await ScheduleRepository.findById(scheduleId);
+    const schedule = await this.findById(scheduleId);
+    if (!schedule) throw new HttpError(500, 'schedule not found');
 
-    await ScheduleRepository.updateById(schedule.id, {
-      status: 'pending',
-    });
+    await this.updateById(schedule.id, { status: 'pending' });
 
     const reports = await ReportResource.findMany({
-      where: {
-        scheduleId: schedule.id,
-      },
+      where: { scheduleId: schedule.id },
     });
 
     await queuedAsyncMap(reports, async (item) => {
       await ReportResource.destroyById(item.id);
     });
+
+    return true;
+  }
+
+  async confirmed(data: { scheduleId: string }) {
+    const { scheduleId } = data;
+
+    const schedule = await this.findById(scheduleId);
+    if (!schedule) throw new HttpError(500, 'schedule not found');
+
+    await this.updateById(schedule.id, { status: 'confirmed' });
+
+    // send notification
+
+    return true;
+  }
+
+  async canceled(data: { scheduleId: string }) {
+    const { scheduleId } = data;
+
+    const schedule = await this.findById(scheduleId);
+    if (!schedule) throw new HttpError(500, 'schedule not found');
+
+    await this.updateById(schedule.id, { status: 'canceled' });
+
+    // send notification
 
     return true;
   }

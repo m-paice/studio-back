@@ -32,6 +32,22 @@ const controllerCustom = {
 
     return response;
   }),
+
+  confirmed: promiseHandler(async (req) => {
+    const { id } = req.params;
+
+    const response = schedulesResource.confirmed({ scheduleId: id });
+
+    return response;
+  }),
+
+  canceled: promiseHandler(async (req) => {
+    const { id } = req.params;
+
+    const response = schedulesResource.canceled({ scheduleId: id });
+
+    return response;
+  }),
 };
 
 const router = Router();
@@ -47,5 +63,7 @@ router.delete('/:id', controller.destroy);
 
 router.put('/:id/status', controllerCustom.changeStatus);
 router.get('/:id/revert', controllerCustom.revert);
+router.get('/:id/confirmed', controllerCustom.confirmed);
+router.get('/:id/canceled', controllerCustom.canceled);
 
 export default router;

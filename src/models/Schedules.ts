@@ -17,7 +17,7 @@ export type ScheduleInstance = {
   employeeId: string;
   scheduleAt: Date;
   shortName: string;
-  status: 'pending' | 'finished' | 'canceled';
+  status: 'pending' | 'finished' | 'canceled' | 'confirmed' | 'canceled';
   discount: number;
   averageTime: number;
   addition: number;
