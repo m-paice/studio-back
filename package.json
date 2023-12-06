@@ -1,6 +1,6 @@
 {
   "name": "studio-api",
-  "version": "1.0.67",
+  "version": "1.0.68",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

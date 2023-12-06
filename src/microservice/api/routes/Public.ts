@@ -40,7 +40,7 @@ const controllerCustom = {
         {
           model: User,
           as: 'user',
-          attributes: ['name'],
+          attributes: ['name', 'shortName'],
         },
       ],
     });
