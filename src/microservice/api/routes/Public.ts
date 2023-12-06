@@ -7,6 +7,7 @@ import resource from '../../../resource';
 import { sendNotification } from '../../../services/expo';
 import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import { days } from '../../../constants/days';
+import User from '../../../models/Users';
 
 const controllerCustom = {
   info: promiseHandler(async (req) => {
@@ -35,6 +36,13 @@ const controllerCustom = {
         accountId,
         ...req.query.where,
       },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
+        },
+      ],
     });
 
     return schedules;
