@@ -57,7 +57,7 @@ export async function sendMessage({ campaign, schedule }: Send) {
     template: template.name,
     phoneNumber: `55${formatPhoneNumber(schedule.user.cellPhone)}`,
     content: '',
-    scheduleId: campaign.accountId,
+    scheduleId: schedule.id,
     campaignId: campaign.id,
   };
 
