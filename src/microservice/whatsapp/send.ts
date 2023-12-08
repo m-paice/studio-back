@@ -36,6 +36,9 @@ export async function sendMessage({ campaign, schedule }: Send) {
   const hour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
   let time = '';
 
+  console.log(campaign.timeBeforeSchedule);
+  console.log(typeof campaign.timeBeforeSchedule);
+
   if (campaign.timeBeforeSchedule === 1) {
     time = '1 hora';
   } else if (campaign.timeBeforeSchedule > 1 && campaign.timeBeforeSchedule < 24) {
