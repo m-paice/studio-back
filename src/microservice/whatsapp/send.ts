@@ -34,10 +34,16 @@ export async function sendMessage({ campaign, schedule }: Send) {
   const services = (schedule.services as ServiceInstance[]).map((service) => service.name).join(', ');
   const date = format(subHours(new Date(schedule.scheduleAt), 3), 'dd MMMM', { locale: ptBR });
   const hour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
-  const time =
-    (campaign.timeBeforeSchedule === 1 && '1 hora') ||
-    (campaign.timeBeforeSchedule < 24 && `${campaign.timeBeforeSchedule} horas`) ||
-    `${campaign.timeBeforeSchedule} dia`;
+  let time = '';
+
+  if (campaign.timeBeforeSchedule === 1) {
+    time = '1 hora';
+  } else if (campaign.timeBeforeSchedule > 1 && campaign.timeBeforeSchedule < 24) {
+    time = `${campaign.timeBeforeSchedule} horas`;
+  } else {
+    time = '1 dia';
+  }
+
   const userAdmin = await resource.Users.findOne({
     where: {
       accountId: schedule.accountId,

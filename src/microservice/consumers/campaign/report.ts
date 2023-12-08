@@ -20,7 +20,6 @@ interface ReportData {
 const logger = debug('@report');
 
 export async function createReport(data: ReportData) {
-  logger(`data from report: ${JSON.stringify(data, null, 2)}`);
   try {
     const { campaignId, scheduleId, status } = data.message.data;
 
