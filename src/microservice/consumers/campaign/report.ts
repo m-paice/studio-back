@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 import { CAMPAIGN_DONE, CAMPAIGN_PENDING } from '../../../constants/campaign';
 import CampaignSchedule from '../../../models/CampaignSchedule';
 import resource from '../../../resource';
@@ -15,7 +17,10 @@ interface ReportData {
   };
 }
 
+const logger = debug('@report');
+
 export async function createReport(data: ReportData) {
+  logger(`data from report: ${JSON.stringify(data, null, 2)}`);
   try {
     const { campaignId, scheduleId, status } = data.message.data;
 
@@ -43,6 +48,6 @@ export async function createReport(data: ReportData) {
       await resource.Campaigns.updateById(campaignId, { status: CAMPAIGN_DONE });
     }
   } catch (error) {
-    console.error(error);
+    logger(`error report ${error}`);
   }
 }

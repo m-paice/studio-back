@@ -1,4 +1,5 @@
 import { format, subHours } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import resource from '../../resource';
 import { amqpClient } from '../../services/amqp';
 import { CampaignInstance } from '../../models/Campaigns';
@@ -31,7 +32,7 @@ export async function sendMessage({ campaign, schedule }: Send) {
   const nameClient = schedule.user.name;
   const accountName = schedule.account.name;
   const services = (schedule.services as ServiceInstance[]).map((service) => service.name).join(', ');
-  const date = format(subHours(new Date(schedule.scheduleAt), 3), 'dd MMMM');
+  const date = format(subHours(new Date(schedule.scheduleAt), 3), 'dd MMMM', { locale: ptBR });
   const hour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
   const time =
     (campaign.timeBeforeSchedule === 1 && '1 hora') ||
