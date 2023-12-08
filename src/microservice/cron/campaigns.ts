@@ -1,4 +1,5 @@
 import { subHours, isAfter } from 'date-fns';
+import debug from 'debug';
 
 import { CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../../constants/campaign';
 import resource from '../../resource';
@@ -9,6 +10,8 @@ import Schedule from '../../models/Schedules';
 import Services from '../../models/Services';
 import User from '../../models/Users';
 import CampaignSchedule, { CampaignScheduleInstance } from '../../models/CampaignSchedule';
+
+const logger = debug('@campaign');
 
 export const handleCampaigns = async () => {
   const campaigns = await resource.Campaigns.findMany({
@@ -51,10 +54,14 @@ export const handleCampaigns = async () => {
       const schedulePreviousTime = subHours(new Date(schedule.scheduleAt), campaign.timeBeforeSchedule);
 
       if (isAfter(new Date(), schedulePreviousTime)) {
-        await sendMessage({
-          campaign,
-          schedule,
-        });
+        try {
+          await sendMessage({
+            campaign,
+            schedule,
+          });
+        } catch (error) {
+          logger('Failed to campaign to exchange: %O', error);
+        }
       }
     });
   });
