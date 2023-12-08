@@ -36,13 +36,12 @@ export async function sendMessage({ campaign, schedule }: Send) {
   const hour = format(subHours(new Date(schedule.scheduleAt), 3), 'HH:mm');
   let time = '';
 
-  console.log(campaign.timeBeforeSchedule);
-  console.log(typeof campaign.timeBeforeSchedule);
+  const timeBeforeSchedule = campaign.timeBeforeSchedule ? parseInt(campaign.timeBeforeSchedule.toString(), 10) : 0;
 
-  if (campaign.timeBeforeSchedule === 1) {
+  if (timeBeforeSchedule === 1) {
     time = '1 hora';
-  } else if (campaign.timeBeforeSchedule > 1 && campaign.timeBeforeSchedule < 24) {
-    time = `${campaign.timeBeforeSchedule} horas`;
+  } else if (timeBeforeSchedule > 1 && timeBeforeSchedule < 24) {
+    time = `${timeBeforeSchedule} horas`;
   } else {
     time = '1 dia';
   }
