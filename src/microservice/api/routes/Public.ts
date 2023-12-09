@@ -51,6 +51,8 @@ const controllerCustom = {
     const accountId = req.params.id;
     const payload = req.body;
 
+    console.log(JSON.stringify(payload, null, 2));
+
     let user = await resource.Users.findOne({
       where: {
         accountId,
@@ -66,6 +68,8 @@ const controllerCustom = {
         accountId,
       });
     }
+
+    console.log(user);
 
     const userAdmin = await resource.Users.findOne({
       where: {
