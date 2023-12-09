@@ -29,7 +29,7 @@ interface Send {
 export async function sendMessage({ campaign, schedule }: Send) {
   const template = await resource.Templates.findById(campaign.templateId);
 
-  const nameClient = schedule.user.name;
+  const nameClient = schedule?.shortName || schedule?.user?.name || '';
   const accountName = schedule.account.name;
   const services = (schedule.services as ServiceInstance[]).map((service) => service.name).join(', ');
   const date = format(subHours(new Date(schedule.scheduleAt), 3), 'dd MMMM', { locale: ptBR });
@@ -63,7 +63,7 @@ export async function sendMessage({ campaign, schedule }: Send) {
     timeBefore: time,
     phoneAccount,
     template: template.name,
-    phoneNumber: `55${formatPhoneNumber(schedule.user.cellPhone)}`,
+    phoneNumber: schedule?.user?.cellPhone ? `55${formatPhoneNumber(schedule.user.cellPhone)}` : null,
     content: '',
     scheduleId: schedule.id,
     campaignId: campaign.id,
