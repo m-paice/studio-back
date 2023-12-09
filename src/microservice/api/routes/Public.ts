@@ -51,6 +51,22 @@ const controllerCustom = {
     const accountId = req.params.id;
     const payload = req.body;
 
+    let user = await resource.Users.findOne({
+      where: {
+        accountId,
+        cellPhone: payload.cellPhone,
+      },
+    });
+
+    if (!user) {
+      user = await resource.Users.create({
+        name: payload.shortName,
+        cellPhone: payload.cellPhone,
+        type: 'pf',
+        accountId,
+      });
+    }
+
     const userAdmin = await resource.Users.findOne({
       where: {
         accountId,
@@ -62,6 +78,7 @@ const controllerCustom = {
       ...payload,
       accountId,
       employeeId: userAdmin.id,
+      user: user.id,
     });
 
     const account = await resource.Accounts.findById(accountId);
