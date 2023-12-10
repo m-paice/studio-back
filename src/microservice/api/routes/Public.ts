@@ -42,6 +42,8 @@ const controllerCustom = {
   createSchedule: promiseHandler(async (req) => {
     const accountId = req.params.id;
     const payload = req.body;
+    const { name, cellPhone } = req.body;
+    const account = await resource.Accounts.findById(accountId);
 
     const userAdmin = await resource.Users.findOne({
       where: {
@@ -50,13 +52,29 @@ const controllerCustom = {
       },
     });
 
+    let existingUser = await resource.Users.findOne({
+      where: {
+        accountId,
+        cellPhone: payload.cellPhone,
+      },
+    });
+
+    if (!existingUser) {
+      await resource.Users.create({
+        name,
+        cellPhone,
+        type: 'pj',
+        isSuperAdmin: false,
+        accountId: account.id,
+      });
+    }
+
     const response = await resource.Schedules.create({
       ...payload,
       accountId,
       employeeId: userAdmin.id,
+      userId: existingUser.id,
     });
-
-    const account = await resource.Accounts.findById(accountId);
 
     if (response && account.token && Array.isArray(JSON.parse(account.token as unknown as string))) {
       await queuedAsyncMap(JSON.parse(account.token as unknown as string), async (token) => {
