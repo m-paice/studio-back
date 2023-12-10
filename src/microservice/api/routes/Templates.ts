@@ -3,7 +3,6 @@ import { Router } from 'express';
 import resource from '../../../resource';
 import controllerDefaut from '../controller';
 import { accountContext } from '../../../middleware/accountContext';
-import { billing } from '../../../middleware/billing';
 
 const whiteList = [];
 
@@ -12,7 +11,7 @@ const controller = controllerDefaut(resource.Templates, whiteList);
 const router = Router();
 
 router.use(accountContext);
-router.use(billing);
+// router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

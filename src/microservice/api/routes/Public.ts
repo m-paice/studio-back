@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import { format, getDay } from 'date-fns';
 import { promiseHandler } from '../../../utils/routing';
-import { billing } from '../../../middleware/billing';
 import resource from '../../../resource';
 import { sendNotification } from '../../../services/expo';
 import queuedAsyncMap from '../../../utils/queuedAsyncMap';
@@ -155,7 +154,7 @@ const controllerCustom = {
 
 const router = Router();
 
-router.use(billing);
+// router.use(billing);
 
 router.get('/account/:id/info', controllerCustom.info);
 router.get('/account/:id/services', controllerCustom.services);

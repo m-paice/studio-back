@@ -3,7 +3,6 @@ import { Router } from 'express';
 import accountsResource from '../../../resource/Accounts';
 import { promiseHandler } from '../../../utils/routing';
 import controllerDefaut from '../controller';
-import { billing } from '../../../middleware/billing';
 
 const controller = controllerDefaut(accountsResource);
 
@@ -17,7 +16,7 @@ const controllerCustom = {
 
 const router = Router();
 
-router.use(billing);
+// router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);

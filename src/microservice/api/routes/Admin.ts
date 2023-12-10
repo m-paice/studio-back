@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import Resource from '../../../resource';
 import { promiseHandler } from '../../../utils/routing';
-import { billing } from '../../../middleware/billing';
 
 const controllerCustom = {
   users: promiseHandler(async () => Resource.Admin.users()),
@@ -11,7 +10,7 @@ const controllerCustom = {
 
 const router = Router();
 
-router.use(billing);
+// router.use(billing);
 
 router.get('/users', controllerCustom.users);
 router.get('/accounts', controllerCustom.accounts);

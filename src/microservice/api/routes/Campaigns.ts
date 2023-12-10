@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import resource from '../../../resource';
 import controllerDefaut from '../controller';
-import { billing } from '../../../middleware/billing';
+// import { billing } from '../../../middleware/billing';
 import { enableAccount } from '../../../middleware/enableAccount';
 import { accountContext } from '../../../middleware/accountContext';
 import { promiseHandler } from '../../../utils/routing';
@@ -38,7 +38,7 @@ const router = Router();
 
 router.use(accountContext);
 router.use(enableAccount);
-router.use(billing);
+// router.use(billing);
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);
