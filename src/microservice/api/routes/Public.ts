@@ -7,6 +7,7 @@ import { sendNotification } from '../../../services/expo';
 import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import { days } from '../../../constants/days';
 import User from '../../../models/Users';
+import { sendNotificationFirebase } from '../../../services/firebase';
 
 const controllerCustom = {
   info: promiseHandler(async (req) => {
@@ -93,6 +94,8 @@ const controllerCustom = {
           title: 'Novo agendamento',
           message: `O cliente ${response.shortName} acabou de criar um agendamento utilizando o seu link. Para o dia ${date} (${days[dayWeek]}) ás ${time}`,
         });
+
+        await sendNotificationFirebase({ token });
       });
     }
 

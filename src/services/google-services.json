@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1015772001206",
+    "project_id": "meu-petrecho",
+    "storage_bucket": "meu-petrecho.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015772001206:android:bc813d73051efc93780717",
+        "android_client_info": {
+          "package_name": "com.mpaice.meupetrechoapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPhoebIOn04D11w65-lnBv_oLfkoF_3WQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
