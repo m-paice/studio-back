@@ -82,11 +82,16 @@ const controllerCustom = {
 
     const account = await resource.Accounts.findById(accountId);
 
+    console.log(`account token: `, account.token);
+
     if (response && account.token && Array.isArray(JSON.parse(account.token as unknown as string))) {
+      console.log('has token avaliable');
       await queuedAsyncMap(JSON.parse(account.token as unknown as string), async (token) => {
         const date = format(new Date(response.scheduleAt), 'dd/MM');
         const dayWeek = getDay(new Date(response.scheduleAt));
         const time = format(new Date(response.scheduleAt), 'HH:mm');
+
+        console.log({ token });
 
         await sendNotification({
           token,
