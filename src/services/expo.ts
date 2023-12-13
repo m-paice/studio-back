@@ -19,9 +19,8 @@ export async function sendNotification({ token, title, message }) {
   };
 
   try {
-    logger(`payload: ${JSON.stringify(payload)}`);
     const response = await expo.sendPushNotificationsAsync([payload]);
-    logger(`response notification: ${response}`);
+    logger(`response notification: ${JSON.stringify(response, null, 2)}`);
   } catch (error) {
     logger(`erro send notification: ${error}`);
   }
