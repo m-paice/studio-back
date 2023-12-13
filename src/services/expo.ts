@@ -19,7 +19,9 @@ export async function sendNotification({ token, title, message }) {
   };
 
   try {
-    const response = await expo.sendPushNotificationsAsync([payload]);
+    logger(`payload: ${JSON.stringify(payload, null, 2)}`);
+    const [chunk] = expo.chunkPushNotifications([payload]);
+    const response = await expo.sendPushNotificationsAsync(chunk);
     logger(`response notification: ${JSON.stringify(response, null, 2)}`);
   } catch (error) {
     logger(`erro send notification: ${error}`);
