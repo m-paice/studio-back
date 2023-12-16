@@ -8,6 +8,7 @@ import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import { days } from '../../../constants/days';
 import User from '../../../models/Users';
 import { sendNotificationFirebase } from '../../../services/firebase';
+import ScheduleResource from '../../../resource/Schedules';
 
 const controllerCustom = {
   info: promiseHandler(async (req) => {
@@ -31,7 +32,7 @@ const controllerCustom = {
   schedules: promiseHandler(async (req) => {
     const accountId = req.params.id;
 
-    const schedules = await resource.Schedules.findMany({
+    const schedules = await ScheduleResource.findMany({
       where: {
         accountId,
         ...req.query.where,
