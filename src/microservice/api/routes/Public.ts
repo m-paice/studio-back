@@ -75,7 +75,7 @@ const controllerCustom = {
       },
     });
 
-    const response = await resource.Schedules.create({
+    const response = await ScheduleResource.create({
       ...payload,
       accountId,
       employeeId: userAdmin.id,
