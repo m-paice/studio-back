@@ -1,3 +1,5 @@
+import { Op } from 'sequelize';
+import { startOfDay, endOfDay } from 'date-fns';
 import BaseResource from './BaseResource';
 import ScheduleRepository from '../repository/Schedules';
 import { ScheduleInstance } from '../models/Schedules';
@@ -6,6 +8,8 @@ import queuedAsyncMap from '../utils/queuedAsyncMap';
 import ServiceResource from './Services';
 import ServiceSchedule from '../models/ServiceSchedule';
 import { HttpError } from '../utils/error/HttpError';
+import resource from '.';
+import { CAMPAIGN_PENDING } from '../constants/campaign';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -23,6 +27,21 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
             await newRecord.addService(service, { through: { isPackage: item.isPackage } });
           });
         }
+
+        const startDay = startOfDay(new Date(newRecord.scheduleAt)).toISOString();
+        const endDay = endOfDay(new Date(newRecord.scheduleAt)).toISOString();
+
+        // check campanha active and add schedule
+        const checkCampaign = await resource.Campaigns.findOne({
+          where: {
+            accountId: newRecord.accountId,
+            scheduleAt: {
+              [Op.between]: [startDay, endDay],
+            },
+          },
+        });
+
+        if (checkCampaign) await checkCampaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
       },
       onUpdated: async (props) => {
         const body = props.body as { services: { id: string; isPackage: boolean }[] };
