@@ -9,7 +9,7 @@ import ServiceResource from './Services';
 import ServiceSchedule from '../models/ServiceSchedule';
 import { HttpError } from '../utils/error/HttpError';
 import resource from '.';
-import { CAMPAIGN_PENDING } from '../constants/campaign';
+import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -41,7 +41,12 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           },
         });
 
-        if (checkCampaign) await checkCampaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
+        if (checkCampaign) {
+          await checkCampaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
+          if (checkCampaign.status === CAMPAIGN_DONE) {
+            await resource.Campaigns.updateById(checkCampaign.id, { status: CAMPAIGN_PROCECSSING });
+          }
+        }
       },
       onUpdated: async (props) => {
         const body = props.body as { services: { id: string; isPackage: boolean }[] };
