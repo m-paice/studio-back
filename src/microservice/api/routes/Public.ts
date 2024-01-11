@@ -1,14 +1,14 @@
 import { Router } from 'express';
+import { format, getDay, subHours } from 'date-fns';
 
-import { format, getDay } from 'date-fns';
-import { promiseHandler } from '../../../utils/routing';
-import resource from '../../../resource';
-import { sendNotification } from '../../../services/expo';
-import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import { days } from '../../../constants/days';
-import User from '../../../models/Users';
-import { sendNotificationFirebase } from '../../../services/firebase';
+import { sendNotification } from '../../../services/expo';
+import { promiseHandler } from '../../../utils/routing';
+import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import ScheduleResource from '../../../resource/Schedules';
+import resource from '../../../resource';
+import User from '../../../models/Users';
+import Service from '../../../models/Services';
 
 const controllerCustom = {
   info: promiseHandler(async (req) => {
@@ -86,17 +86,35 @@ const controllerCustom = {
 
     if (response && account.token && Array.isArray(JSON.parse(account.token as unknown as string))) {
       await queuedAsyncMap(JSON.parse(account.token as unknown as string), async (token) => {
+        const schedule = await ScheduleResource.findById(response.id, {
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['name'],
+            },
+            {
+              model: Service,
+              as: 'services',
+              attributes: ['name'],
+            },
+          ],
+        });
+
+        const serviceNames = schedule.services.map((service) => service.name).join(', ');
+        const clientName = schedule?.user?.name || schedule.shortName;
+
         const date = format(new Date(response.scheduleAt), 'dd/MM');
         const dayWeek = getDay(new Date(response.scheduleAt));
-        const time = format(new Date(response.scheduleAt), 'HH:mm');
+        const time = format(subHours(new Date(response.scheduleAt), 3), 'HH:mm');
 
         await sendNotification({
           token,
           title: 'Novo agendamento',
-          message: `O cliente ${response.shortName} acabou de criar um agendamento utilizando o seu link. Para o dia ${date} (${days[dayWeek]}) ás ${time}`,
+          message: `O cliente ${clientName} realizou recentemente uma reserva por meio do seu link. 
+          O agendamento está programado para o dia ${date} (${days[dayWeek]}) às ${time}. 
+          Os serviços solicitados incluem: ${serviceNames}.`,
         });
-
-        await sendNotificationFirebase({ token });
       });
     }
 
