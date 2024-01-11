@@ -34,6 +34,7 @@ export class AccountsResource extends BaseResource<AccountInstance> {
       name,
       trial: true,
       enable: true,
+      isAutoCampaign: true,
       dueDate,
       type: 'schedules',
     };

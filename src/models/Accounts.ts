@@ -7,9 +7,9 @@ export type AccountInstance = {
   name: string;
   type: string;
   trial: boolean;
-  // credit: number;
   enable: boolean;
   dueDate: Date | null;
+  isAutoCampaign: boolean;
   config: {
     startAt: number;
     endAt: number;
@@ -38,6 +38,7 @@ const Account = sequelize.define(
     },
     name: Sequelize.STRING,
     type: Sequelize.STRING,
+    isAutoCampaign: Sequelize.BOOLEAN,
     createdAt: {
       type: Sequelize.DATE,
       allowNull: false,

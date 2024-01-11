@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, format } from 'date-fns';
 import BaseResource from './BaseResource';
 import ScheduleRepository from '../repository/Schedules';
 import { ScheduleInstance } from '../models/Schedules';
@@ -9,7 +9,12 @@ import ServiceResource from './Services';
 import ServiceSchedule from '../models/ServiceSchedule';
 import { HttpError } from '../utils/error/HttpError';
 import resource from '.';
-import { CAMPAIGN_DONE, CAMPAIGN_PENDING, CAMPAIGN_PROCECSSING } from '../constants/campaign';
+import {
+  CAMPAIGN_DEFAULT_TEMPLEATE_ID,
+  CAMPAIGN_DONE,
+  CAMPAIGN_PENDING,
+  CAMPAIGN_PROCECSSING,
+} from '../constants/campaign';
 
 export class ScheduleResource extends BaseResource<ScheduleInstance> {
   constructor() {
@@ -46,6 +51,23 @@ export class ScheduleResource extends BaseResource<ScheduleInstance> {
           if (checkCampaign.status === CAMPAIGN_DONE) {
             await resource.Campaigns.updateById(checkCampaign.id, { status: CAMPAIGN_PROCECSSING });
           }
+        }
+
+        if (!checkCampaign) {
+          const schedule = await this.findById(newRecord.id, { include: ['account'] });
+
+          if (!schedule.account.isAutoCampaign) return;
+
+          const campaign = await resource.Campaigns.create({
+            accountId: newRecord.accountId,
+            name: `Campanha lembrete do dia ${format(new Date(newRecord.scheduleAt), 'dd/MM')}`,
+            timeBeforeSchedule: 1,
+            status: CAMPAIGN_PROCECSSING,
+            templateId: CAMPAIGN_DEFAULT_TEMPLEATE_ID,
+            scheduleAt: newRecord.scheduleAt,
+          });
+
+          await campaign.addSchedule(newRecord, { through: { status: CAMPAIGN_PENDING } });
         }
       },
       onUpdated: async (props) => {
