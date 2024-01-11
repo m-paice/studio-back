@@ -172,6 +172,46 @@ const controllerCustom = {
       token: tokens,
     });
   }),
+
+  confirm: promiseHandler(async (req, res) => {
+    const id = req.params.id.replace('{{1}}', '');
+
+    const schedule = await ScheduleResource.findById(id, { include: ['account'] });
+
+    if (schedule) {
+      if (
+        schedule &&
+        schedule.account.token &&
+        Array.isArray(JSON.parse(schedule.account.token as unknown as string))
+      ) {
+        await queuedAsyncMap(JSON.parse(schedule.account.token as unknown as string), async (token) => {
+          const scheduleFull = await ScheduleResource.findById(id, {
+            include: [
+              {
+                model: User,
+                as: 'user',
+                attributes: ['name'],
+              },
+            ],
+          });
+
+          const clientName = scheduleFull?.user?.name || scheduleFull.shortName;
+
+          const date = format(new Date(scheduleFull.scheduleAt), 'dd/MM');
+          const dayWeek = getDay(new Date(scheduleFull.scheduleAt));
+          const time = format(subHours(new Date(scheduleFull.scheduleAt), 3), 'HH:mm');
+
+          await sendNotification({
+            token,
+            title: 'Agendamento confirmado',
+            message: `O cliente ${clientName} confirmou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`,
+          });
+        });
+      }
+    }
+
+    res.redirect('https://meupetrecho.com.br/confirmacao');
+  }),
 };
 
 const router = Router();
@@ -185,5 +225,6 @@ router.post('/account/:id/schedules', controllerCustom.createSchedule);
 router.post('/account/trial', controllerCustom.createAccountAndUser);
 router.put('/account/:id/config', controllerCustom.updateAccountConfig);
 router.put('/account/:id/token', controllerCustom.updateAccountToken);
+router.get('/schedule/confirm/:id', controllerCustom.confirm);
 
 export default router;
