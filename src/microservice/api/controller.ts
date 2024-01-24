@@ -1,12 +1,12 @@
 import debug from 'debug';
 import { Request, Response } from 'express';
-import { Includeable } from 'sequelize';
 
 import { sendMessageDiscord } from '../../services/discord';
+import sequelize from '../../services/sequelize';
 
 const logger = debug('@controller');
 
-export default <T>(resource: any, whiteList?: string[] | Includeable | Includeable[]) => {
+export default <T>(resource: any, whiteList?: string[]) => {
   const many = async (req: Request, res: Response) => {
     const { query } = req;
 
@@ -31,10 +31,23 @@ export default <T>(resource: any, whiteList?: string[] | Includeable | Includeab
     const { query } = req;
 
     try {
+      let include: any = [];
+
+      if (whiteList) include = whiteList;
+      if (query.include) {
+        include = [
+          ...include,
+          ...(query.include as any[]).map((item) => ({
+            ...item,
+            model: sequelize.models[item.model],
+          })),
+        ];
+      }
+
       const response = await resource
         .findManyPaginated({
           ...query,
-          ...(whiteList && { include: whiteList }),
+          include,
           order: query?.order || [['updatedAt', 'DESC']],
         })
         .then((data: Partial<T>) => data);

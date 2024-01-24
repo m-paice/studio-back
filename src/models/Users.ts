@@ -63,6 +63,10 @@ User.associate = (models) => {
     through: models.CampaignUser,
     as: 'campaign',
   });
+  User.hasMany(models.Schedules, {
+    foreignKey: 'userId',
+    as: 'schedules'
+  })
 };
 
 export default User;
