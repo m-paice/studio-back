@@ -41,10 +41,17 @@ const controllerCustom = {
         {
           model: User,
           as: 'user',
-          attributes: ['name'],
+          attributes: req.query.me ? ['name', 'cellPhone'] : ['name'],
         },
       ],
     });
+
+    if (req.query.me) {
+      return schedules.map((item) => {
+        if (item.user.cellPhone !== req.query.me) return { ...item, user: { ...item.user, cellPhone: '******' } };
+        return item;
+      });
+    }
 
     return schedules;
   }),
