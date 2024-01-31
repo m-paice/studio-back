@@ -219,6 +219,48 @@ const controllerCustom = {
 
     res.redirect('https://meupetrecho.com.br/confirmacao');
   }),
+
+  cancel: promiseHandler(async (req) => {
+    const { id } = req.params;
+
+    const schedule = await ScheduleResource.findById(id, { include: ['account'] });
+
+    if (schedule) {
+      await ScheduleResource.updateById(id, { status: 'canceled' });
+
+      if (
+        schedule &&
+        schedule.account.token &&
+        Array.isArray(JSON.parse(schedule.account.token as unknown as string))
+      ) {
+        await queuedAsyncMap(JSON.parse(schedule.account.token as unknown as string), async (token) => {
+          const scheduleFull = await ScheduleResource.findById(id, {
+            include: [
+              {
+                model: User,
+                as: 'user',
+                attributes: ['name'],
+              },
+            ],
+          });
+
+          const clientName = scheduleFull?.user?.name || scheduleFull.shortName;
+
+          const date = format(new Date(scheduleFull.scheduleAt), 'dd/MM');
+          const dayWeek = getDay(new Date(scheduleFull.scheduleAt));
+          const time = format(subHours(new Date(scheduleFull.scheduleAt), 3), 'HH:mm');
+
+          await sendNotification({
+            token,
+            title: 'Agendamento cancelado',
+            message: `O cliente ${clientName} cancelou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`,
+          });
+        });
+      }
+    }
+
+    return true
+  }),
 };
 
 const router = Router();
@@ -233,5 +275,6 @@ router.post('/account/trial', controllerCustom.createAccountAndUser);
 router.put('/account/:id/config', controllerCustom.updateAccountConfig);
 router.put('/account/:id/token', controllerCustom.updateAccountToken);
 router.get('/schedule/confirm/:id', controllerCustom.confirm);
+router.delete('/schedule/cancel/:id', controllerCustom.cancel);
 
 export default router;
