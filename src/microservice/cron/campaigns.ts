@@ -50,6 +50,7 @@ export const handleCampaigns = async () => {
         },
       })) as unknown as CampaignScheduleInstance;
       if (campaignSchedule.status !== CAMPAIGN_PENDING) return;
+      if (schedule.status === 'canceled') return;
 
       const schedulePreviousTime = subHours(new Date(schedule.scheduleAt), campaign.timeBeforeSchedule);
 
