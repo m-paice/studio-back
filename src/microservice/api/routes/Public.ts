@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { format, getDay, subHours } from 'date-fns';
+import { format, getDay, isAfter, subHours } from 'date-fns';
 
 import { days } from '../../../constants/days';
 import { sendNotification } from '../../../services/expo';
@@ -225,6 +225,12 @@ const controllerCustom = {
 
     const schedule = await ScheduleResource.findById(id, { include: ['account'] });
 
+    if (isAfter(new Date(), subHours(new Date(schedule.scheduleAt), 1))) {
+      throw new Error(
+        `Não é possível cancelar o agendamento. Faltando menos de 1 hora para o horário marcado. ${schedule.scheduleAt}`,
+      );
+    }
+
     if (schedule) {
       await ScheduleResource.updateById(id, { status: 'canceled' });
 
@@ -259,7 +265,7 @@ const controllerCustom = {
       }
     }
 
-    return true
+    return true;
   }),
 };
 
