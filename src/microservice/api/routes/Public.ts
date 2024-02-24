@@ -6,6 +6,7 @@ import { sendNotification } from '../../../services/expo';
 import { promiseHandler } from '../../../utils/routing';
 import queuedAsyncMap from '../../../utils/queuedAsyncMap';
 import ScheduleResource from '../../../resource/Schedules';
+import NotificationsResource from '../../../resource/Notifications';
 import resource from '../../../resource';
 import User from '../../../models/Users';
 import Service from '../../../models/Services';
@@ -115,13 +116,18 @@ const controllerCustom = {
         const dayWeek = getDay(new Date(response.scheduleAt));
         const time = format(subHours(new Date(response.scheduleAt), 3), 'HH:mm');
 
+        const title = 'Novo agendamento';
+        const message = `O cliente ${clientName} realizou recentemente uma reserva por meio do seu link. 
+        O agendamento está programado para o dia ${date} (${days[dayWeek]}) às ${time}. 
+        Os serviços solicitados incluem: ${serviceNames}.`;
+
         await sendNotification({
           token,
-          title: 'Novo agendamento',
-          message: `O cliente ${clientName} realizou recentemente uma reserva por meio do seu link. 
-          O agendamento está programado para o dia ${date} (${days[dayWeek]}) às ${time}. 
-          Os serviços solicitados incluem: ${serviceNames}.`,
+          title,
+          message,
         });
+
+        await NotificationsResource.create({ accountId, title, content: message });
       });
     }
 
@@ -208,11 +214,16 @@ const controllerCustom = {
           const dayWeek = getDay(new Date(scheduleFull.scheduleAt));
           const time = format(subHours(new Date(scheduleFull.scheduleAt), 3), 'HH:mm');
 
+          const title = 'Agendamento confirmado';
+          const message = `O cliente ${clientName} confirmou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`;
+
           await sendNotification({
             token,
-            title: 'Agendamento confirmado',
-            message: `O cliente ${clientName} confirmou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`,
+            title,
+            message,
           });
+
+          await NotificationsResource.create({ accountId: schedule.accountId, title, content: message });
         });
       }
     }
@@ -250,16 +261,21 @@ const controllerCustom = {
           const dayWeek = getDay(new Date(scheduleFull.scheduleAt));
           const time = format(subHours(new Date(scheduleFull.scheduleAt), 3), 'HH:mm');
 
+          const title = 'Agendamento cancelado';
+          const message = `O cliente ${clientName} cancelou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`;
+
           await sendNotification({
             token,
-            title: 'Agendamento cancelado',
-            message: `O cliente ${clientName} cancelou o agendamento. Marcado para o dia ${date} (${days[dayWeek]}) às ${time}.`,
+            title,
+            message,
           });
+
+          await NotificationsResource.create({ accountId: schedule.accountId, title, content: message });
         });
       }
     }
 
-    return true
+    return true;
   }),
 };
 

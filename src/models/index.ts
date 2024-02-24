@@ -9,6 +9,7 @@ import Templates from './Templates';
 import Campaigns from './Campaigns';
 import CampaignUser from './CampaignUser';
 import CampaignSchedule from './CampaignSchedule';
+import Notifications from './Notifications';
 
 export default {
   Services,
@@ -22,4 +23,5 @@ export default {
   Campaigns,
   CampaignUser,
   CampaignSchedule,
+  Notifications,
 };

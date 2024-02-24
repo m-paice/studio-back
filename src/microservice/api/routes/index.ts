@@ -11,6 +11,7 @@ import publicRoutes from './Public';
 import templateRoutes from './Templates';
 import campaignsRoutes from './Campaigns';
 import billignsRoutes from './Billigns';
+import notificationsRoutes from './Notifications';
 
 import * as loggers from '../../../utils/logger';
 import auth from '../../../middleware/auth';
@@ -28,6 +29,7 @@ routes.use('/reports', auth, reportsRoutes);
 routes.use('/templates', auth, templateRoutes);
 routes.use('/billigns', auth, billignsRoutes);
 routes.use('/campaigns', auth, campaignsRoutes);
+routes.use('/notifications', auth, notificationsRoutes);
 routes.use('/accounts', onlyAdmin, accountsRoutes);
 routes.use('/admin', onlyAdmin, adminRoutes);
 routes.use('/public', publicRoutes);
