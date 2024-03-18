@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { format, getDay, isAfter, subHours } from 'date-fns';
+import { format, getDay, isAfter, subHours, subMinutes } from 'date-fns';
 
 import { days } from '../../../constants/days';
 import { sendNotification } from '../../../services/expo';
@@ -58,6 +58,18 @@ const controllerCustom = {
   createSchedule: promiseHandler(async (req) => {
     const accountId = req.params.id;
     const payload = req.body;
+
+    // find schedule scheduleAt between 5 minutes before and 5 minutes after
+    const scheduleAlreadyExists = await ScheduleResource.findOne({
+      where: {
+        accountId,
+        scheduleAt: {
+          $between: [subMinutes(new Date(payload.scheduleAt), 5), subMinutes(new Date(payload.scheduleAt), -5)],
+        },
+      },
+    });
+
+    if (scheduleAlreadyExists) throw new Error('Já existe um agendamento para este horário.');
 
     let user = await resource.Users.findOne({
       where: {
