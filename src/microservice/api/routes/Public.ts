@@ -279,6 +279,27 @@ const controllerCustom = {
 
     return true;
   }),
+
+  infoSchedule: promiseHandler(async (req) => {
+    const { id } = req.params;
+
+    const schedule = await ScheduleResource.findById(id, {
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name', 'cellPhone'],
+        },
+        {
+          model: Service,
+          as: 'services',
+          attributes: ['name'],
+        },
+      ],
+    });
+
+    return schedule;
+  }),
 };
 
 const router = Router();
@@ -294,5 +315,6 @@ router.put('/account/:id/config', controllerCustom.updateAccountConfig);
 router.put('/account/:id/token', controllerCustom.updateAccountToken);
 router.get('/schedule/confirm/:id', controllerCustom.confirm);
 router.delete('/schedule/cancel/:id', controllerCustom.cancel);
+router.get('/schedule/details/:id', controllerCustom.infoSchedule);
 
 export default router;
