@@ -303,11 +303,12 @@ const controllerCustom = {
   }),
   updateImage: promiseHandler(async (req) => {
     const { id } = req.params;
-    const { image } = req.body;
 
-    return resource.Services.updateById(id, {
-      image,
+    await resource.Services.updateById(id, {
+      image: req.body?.image ?? null,
     });
+
+    return true;
   }),
 };
 
