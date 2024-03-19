@@ -66,6 +66,7 @@ const controllerCustom = {
         scheduleAt: {
           $between: [subMinutes(new Date(payload.scheduleAt), 5), subMinutes(new Date(payload.scheduleAt), -5)],
         },
+        status: 'pending',
       },
     });
 
