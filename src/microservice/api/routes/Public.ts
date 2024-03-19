@@ -293,7 +293,7 @@ const controllerCustom = {
         {
           model: Service,
           as: 'services',
-          attributes: ['name'],
+          attributes: ['id', 'name', 'price'],
         },
       ],
     });
