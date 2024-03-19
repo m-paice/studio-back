@@ -294,12 +294,20 @@ const controllerCustom = {
         {
           model: Service,
           as: 'services',
-          attributes: ['id', 'name', 'price'],
+          attributes: ['id', 'name', 'price', 'image'],
         },
       ],
     });
 
     return schedule;
+  }),
+  updateImage: promiseHandler(async (req) => {
+    const { id } = req.params;
+    const { image } = req.body;
+
+    return resource.Services.updateById(id, {
+      image,
+    });
   }),
 };
 
@@ -317,5 +325,6 @@ router.put('/account/:id/token', controllerCustom.updateAccountToken);
 router.get('/schedule/confirm/:id', controllerCustom.confirm);
 router.delete('/schedule/cancel/:id', controllerCustom.cancel);
 router.get('/schedule/details/:id', controllerCustom.infoSchedule);
+router.put('/service/image/:id', controllerCustom.updateImage);
 
 export default router;

@@ -11,6 +11,7 @@ export type ServiceInstance = {
   type: string;
   price: number;
   porcent: number;
+  image: string;
   averageTime: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -30,6 +31,7 @@ const Service = sequelize.define(
     name: Sequelize.STRING,
     price: Sequelize.DOUBLE,
     type: Sequelize.STRING,
+    image: Sequelize.TEXT,
     porcent: Sequelize.DOUBLE,
     averageTime: Sequelize.STRING,
     createdAt: {
