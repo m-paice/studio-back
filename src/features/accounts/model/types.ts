@@ -25,9 +25,13 @@ export type AccountInstance = {
 };
 
 export interface AccountCreateParams {
-  name: string;
+  data: AccountInstance;
 }
 export interface AccountFindByIdParams {
+  id: string;
+}
+
+export interface AccountDestroyByIdParams {
   id: string;
 }
 export interface AccountFindParams {
