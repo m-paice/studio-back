@@ -14,11 +14,20 @@ export type UserInstance = {
 };
 
 export interface UserCreateParams {
-  name: string;
+  data: UserInstance;
 }
 
 export interface UserFindByIdParams {
   id: string;
+}
+
+export interface UserDestroyByIdParams {
+  id: string;
+}
+
+export interface UserUpdateByIdParams {
+  id: string;
+  data: Partial<UserInstance>;
 }
 
 export interface UserFindParams {
