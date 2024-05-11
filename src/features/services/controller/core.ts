@@ -5,23 +5,23 @@ import { ResponseAPI } from '../../types/api';
 import * as model from '../model';
 import { validateBodyForCreate, validateBodyForUpdate, validateParamsIsUUID } from './rules';
 
-const logger = debug('features:users:controller:core');
+const logger = debug('features:services:controller:core');
 const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const users = await model.findUsers({});
+    const services = await model.findServices({});
 
     res.json({
       transaction: nanoid(),
-      message: 'Users reader successfully',
-      data: users,
-    } as ResponseAPI<model.UserInstance[]>);
+      message: 'Services reader successfully',
+      data: services,
+    } as ResponseAPI<model.ServiceInstance[]>);
   } catch (error) {
-    logger('Error on reader users: %o', error);
+    logger('Error on reader services: %o', error);
     res.status(500).json({
       transaction: nanoid(),
-      message: 'Users reader error',
+      message: 'Services reader error',
       args: error,
     } as ResponseAPI);
   }
@@ -29,26 +29,26 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', validateParamsIsUUID, async (req, res) => {
   try {
-    const user = await model.findUserById({ id: req.params.id });
+    const service = await model.findServiceById({ id: req.params.id });
 
-    if (!user) {
+    if (!service) {
       res.status(404).json({
         transaction: nanoid(),
-        message: 'User not found',
+        message: 'Service not found',
       } as ResponseAPI);
       return;
     }
 
     res.json({
       transaction: nanoid(),
-      message: 'User reader successfully',
-      data: user,
-    } as ResponseAPI<model.UserInstance>);
+      message: 'Service reader successfully',
+      data: service,
+    } as ResponseAPI<model.ServiceInstance>);
   } catch (error) {
-    logger('Error on reader user: %o', error);
+    logger('Error on reader service: %o', error);
     res.status(500).json({
       transaction: nanoid(),
-      message: 'User reader error',
+      message: 'Service reader error',
       args: error,
     } as ResponseAPI);
   }
@@ -56,18 +56,18 @@ router.get('/:id', validateParamsIsUUID, async (req, res) => {
 
 router.post('/', validateBodyForCreate, async (req, res) => {
   try {
-    const user = await model.createUser({ data: req.body });
+    const service = await model.createService({ data: req.body });
 
     res.json({
       transaction: nanoid(),
-      message: 'User created successfully',
-      data: user,
-    } as ResponseAPI<model.UserInstance>);
+      message: 'Service created successfully',
+      data: service,
+    } as ResponseAPI<model.ServiceInstance>);
   } catch (error) {
-    logger('Error on create user: %o', error);
+    logger('Error on create service: %o', error);
     res.status(500).json({
       transaction: nanoid(),
-      message: 'User create error',
+      message: 'Service create error',
       args: error,
     } as ResponseAPI);
   }
@@ -75,26 +75,26 @@ router.post('/', validateBodyForCreate, async (req, res) => {
 
 router.put('/:id', validateParamsIsUUID, validateBodyForUpdate, async (req, res) => {
   try {
-    const user = await model.updateUserById({ id: req.params.id, data: req.body });
+    const service = await model.updateServiceById({ id: req.params.id, data: req.body });
 
-    if (!user) {
+    if (!service) {
       res.status(404).json({
         transaction: nanoid(),
-        message: 'User not found',
+        message: 'Service not found',
       } as ResponseAPI);
       return;
     }
 
     res.json({
       transaction: nanoid(),
-      message: 'User updated successfully',
-      data: user,
-    } as ResponseAPI<model.UserInstance>);
+      message: 'Service updated successfully',
+      data: service,
+    } as ResponseAPI<model.ServiceInstance>);
   } catch (error) {
-    logger('Error on update user: %o', error);
+    logger('Error on update service: %o', error);
     res.status(500).json({
       transaction: nanoid(),
-      message: 'User update error',
+      message: 'Service update error',
       args: error,
     } as ResponseAPI);
   }
@@ -102,25 +102,25 @@ router.put('/:id', validateParamsIsUUID, validateBodyForUpdate, async (req, res)
 
 router.delete('/:id', validateParamsIsUUID, async (req, res) => {
   try {
-    const user = await model.deleteUserById({ id: req.params.id });
+    const service = await model.deleteServiceById({ id: req.params.id });
 
-    if (!user) {
+    if (!service) {
       res.status(404).json({
         transaction: nanoid(),
-        message: 'User not found',
+        message: 'Service not found',
       } as ResponseAPI);
       return;
     }
 
     res.json({
       transaction: nanoid(),
-      message: 'User deleted successfully',
+      message: 'Service deleted successfully',
     } as ResponseAPI);
   } catch (error) {
-    logger('Error on delete user: %o', error);
+    logger('Error on delete service: %o', error);
     res.status(500).json({
       transaction: nanoid(),
-      message: 'User delete error',
+      message: 'Service delete error',
       args: error,
     } as ResponseAPI);
   }

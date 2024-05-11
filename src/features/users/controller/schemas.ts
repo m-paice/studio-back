@@ -7,3 +7,7 @@ export const schemaValidateBodyForCreate = z.object({
 export const schemaValidateParamsUUID = z.object({
   id: z.string().uuid(),
 });
+
+export const schemaValidateBodyForUpdate = z.object({
+  name: z.string().optional(),
+});

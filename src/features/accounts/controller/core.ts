@@ -4,7 +4,7 @@ import debug from 'debug';
 
 import * as model from '../model';
 import type { ResponseAPI } from '../../types/api';
-import { validateBodyForCreate, validateParamsIsUUID } from './rules';
+import { validateBodyForCreate, validateBodyForUpdate, validateParamsIsUUID } from './rules';
 
 const logger = debug('features:controller:accounts:core');
 const router = Router();
@@ -75,7 +75,7 @@ router.post('/', validateBodyForCreate, async (req, res) => {
   }
 });
 
-router.put('/:id', validateParamsIsUUID, async (req, res) => {
+router.put('/:id', validateParamsIsUUID, validateBodyForUpdate, async (req, res) => {
   try {
     const account = await model.updateAccountById({ id: req.params.id, data: req.body });
 
