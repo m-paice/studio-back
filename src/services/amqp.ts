@@ -47,37 +47,57 @@ export class AmqpServer {
       this.conn = connection;
       this.channel = await this.conn.createChannel();
     } catch (error) {
-      console.error(error);
+      console.error('Error in start', error);
     }
   }
 
   // setup
   async setup(): Promise<void> {
-    await this.channel.assertExchange(EXCHANGE_NAME, 'topic', {
-      durable: false,
-    });
+    try {
+      if (!this.channel) throw new Error('Channel is not ready');
 
-    // creating queue
-    await Promise.all(QUEUES.map(async (item) => this.channel.assertQueue(item.name)));
-    // bind queue with exchange
-    await Promise.all(QUEUES.map(async (item) => this.channel.bindQueue(item.name, EXCHANGE_NAME, item.routingKey)));
+      await this.channel.assertExchange(EXCHANGE_NAME, 'topic', {
+        durable: false,
+      });
+
+      // creating queue
+      await Promise.all(QUEUES.map(async (item) => this.channel.assertQueue(item.name)));
+      // bind queue with exchange
+      await Promise.all(QUEUES.map(async (item) => this.channel.bindQueue(item.name, EXCHANGE_NAME, item.routingKey)));
+    } catch (error) {
+      console.error('Error in setup', error);
+    }
   }
 
   // sender
   async publishInExchangeByRoutingKey<T>({ message, routingKey }: PublishInExchangeOptions<T>): Promise<boolean> {
-    const payload = JSON.stringify(message);
+    try {
+      if (!this.channel) throw new Error('Channel is not ready');
 
-    return this.channel.publish(EXCHANGE_NAME, routingKey, Buffer.from(payload));
+      const payload = JSON.stringify(message);
+
+      return this.channel.publish(EXCHANGE_NAME, routingKey, Buffer.from(payload));
+    } catch (error) {
+      console.error('Error in publishInExchangeByRoutingKey', error);
+      return false;
+    }
   }
 
   // listener
   async consumer({ queue, callback }: ConsumerOptions): Promise<Replies.Consume> {
-    return this.channel.consume(queue, (message) => {
-      if (!message) return;
+    try {
+      if (!this.channel) throw new Error('Channel is not ready');
 
-      callback(message.content.toString());
-      this.channel.ack(message);
-    });
+      return this.channel.consume(queue, (message) => {
+        if (!message) return;
+
+        callback(message.content.toString());
+        this.channel.ack(message);
+      });
+    } catch (error) {
+      console.error('Error in consumer', error);
+      return {} as Replies.Consume;
+    }
   }
 }
 
