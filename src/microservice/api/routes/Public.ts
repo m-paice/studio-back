@@ -43,6 +43,11 @@ const controllerCustom = {
           as: 'user',
           attributes: ['name', 'cellPhone'],
         },
+        {
+          model: Service,
+          as: 'services',
+          attributes: ['name'],
+        },
       ],
     });
 
