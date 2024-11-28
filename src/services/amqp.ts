@@ -48,13 +48,17 @@ export class AmqpServer {
       this.channel = await this.conn.createChannel();
     } catch (error) {
       console.error('Error in start', error);
+      process.exit(1);
     }
   }
 
   // setup
   async setup(): Promise<void> {
     try {
-      if (!this.channel) throw new Error('Channel is not ready');
+      if (!this.channel) {
+        logger('Channel is not ready');
+        process.exit(1);
+      }
 
       await this.channel.assertExchange(EXCHANGE_NAME, 'topic', {
         durable: false,
@@ -72,7 +76,10 @@ export class AmqpServer {
   // sender
   async publishInExchangeByRoutingKey<T>({ message, routingKey }: PublishInExchangeOptions<T>): Promise<boolean> {
     try {
-      if (!this.channel) throw new Error('Channel is not ready');
+      if (!this.channel) {
+        logger('Channel is not ready');
+        process.exit(1);
+      }
 
       const payload = JSON.stringify(message);
 
@@ -86,7 +93,10 @@ export class AmqpServer {
   // listener
   async consumer({ queue, callback }: ConsumerOptions): Promise<Replies.Consume> {
     try {
-      if (!this.channel) throw new Error('Channel is not ready');
+      if (!this.channel) {
+        logger('Channel is not ready');
+        process.exit(1);
+      }
 
       return this.channel.consume(queue, (message) => {
         if (!message) return;
